@@ -1,26 +1,23 @@
 # Story 11.10: Add performance checks
 
 ## Context
-This story belongs to Epic 11: Accessibility, Resilience, and Quality. It contributes to the MVP in a small, reviewable increment.
+Part of Epic 11: Accessibility, Resilience, and Quality. This is an independently reviewable increment toward the MVP.
 
 ## Goal
-Deliver add performance checks using the shared CV model and existing architectural boundaries.
+Deliver add performance checks with observable behavior that can be verified independently of adjacent stories.
 
 ## Acceptance criteria
-- [ ] The capability works as described by the story title and epic purpose.
-- [ ] Relevant state is represented consistently in the shared model and persists where applicable.
-- [ ] Empty, boundary, and failure states are handled explicitly; user content is not silently lost.
-- [ ] Appropriate unit, integration, or browser tests cover the expected path and meaningful edge cases.
-- [ ] Clean-code/layered-architecture guidelines are followed and the PR records verification steps and known limitations.
+- [ ] **Primary behavior:** Measure startup, typing latency, and export time for a documented representative multi-section CV and record environment/thresholds.
+- [ ] **Failure and boundary behavior:** A repeatable regression beyond the agreed threshold fails or flags the check with metrics.
+- [ ] **Scope boundary:** Do not use only an empty document as the benchmark.
+- [ ] **Verification evidence:** Add a focused automated test (unit, integration, or browser test as appropriate) asserting the input and expected result; include a manual preview check for browser, hosting, file handling, or download behavior.
 
-## Constraints
-- Keep the app local-first: explicit project save/open, no accounts/server-side CV storage, no hidden autosave/recovery copies.
-- Project files exclude API keys, tokens, and credentials.
-- Editing, saving, and PDF export must not require AI credentials.
-- AI features, when relevant, are opt-in, grounded in user-provided facts, and never silently applied.
+## Out of scope
+- Unrelated capabilities from other epics.
+- Changing local-first constraints without a separately documented product decision.
 
 ## Dependencies
-Cross-cutting quality work for all epics. See the [MVP roadmap](../README.md); link dependency issues when implementation is authorized.
+See the [MVP roadmap](../README.md) and [Epic 11 overview](./00-epic-overview.md). Add dependency issue links when this story is converted into a GitHub issue.
 
-## Verification
-Test the expected path and failure cases. Validate the deployed feature preview before review/merge when preview infrastructure is available.
+## Verification notes
+Test the primary path and the named boundary case. Record commands/results in the PR and test the deployed feature preview when relevant.

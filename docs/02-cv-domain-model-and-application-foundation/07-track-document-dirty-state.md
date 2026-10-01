@@ -1,26 +1,23 @@
 # Story 2.7: Track document dirty state
 
 ## Context
-This story belongs to Epic 2: CV Domain Model and Application Foundation. It contributes to the MVP in a small, reviewable increment.
+Part of Epic 2: CV Domain Model and Application Foundation. This is an independently reviewable increment toward the MVP.
 
 ## Goal
-Deliver track document dirty state using the shared CV model and existing architectural boundaries.
+Deliver track document dirty state with observable behavior that can be verified independently of adjacent stories.
 
 ## Acceptance criteria
-- [ ] The capability works as described by the story title and epic purpose.
-- [ ] Relevant state is represented consistently in the shared model and persists where applicable.
-- [ ] Empty, boundary, and failure states are handled explicitly; user content is not silently lost.
-- [ ] Appropriate unit, integration, or browser tests cover the expected path and meaningful edge cases.
-- [ ] Clean-code/layered-architecture guidelines are followed and the PR records verification steps and known limitations.
+- [ ] **Primary behavior:** Edit a field, then attempt to open another project; save/discard/cancel choices appear when dirty.
+- [ ] **Failure and boundary behavior:** Cancel preserves the current values; only successful save of the current revision clears dirty state; failed save keeps it dirty.
+- [ ] **Scope boundary:** Canceling a file picker must not discard edits.
+- [ ] **Verification evidence:** Add a focused automated test (unit, integration, or browser test as appropriate) asserting the input and expected result; include a manual preview check for browser, hosting, file handling, or download behavior.
 
-## Constraints
-- Keep the app local-first: explicit project save/open, no accounts/server-side CV storage, no hidden autosave/recovery copies.
-- Project files exclude API keys, tokens, and credentials.
-- Editing, saving, and PDF export must not require AI credentials.
-- AI features, when relevant, are opt-in, grounded in user-provided facts, and never silently applied.
+## Out of scope
+- Unrelated capabilities from other epics.
+- Changing local-first constraints without a separately documented product decision.
 
 ## Dependencies
-Depends on E1. See the [MVP roadmap](../README.md); link dependency issues when implementation is authorized.
+See the [MVP roadmap](../README.md) and [Epic 2 overview](./00-epic-overview.md). Add dependency issue links when this story is converted into a GitHub issue.
 
-## Verification
-Test the expected path and failure cases. Validate the deployed feature preview before review/merge when preview infrastructure is available.
+## Verification notes
+Test the primary path and the named boundary case. Record commands/results in the PR and test the deployed feature preview when relevant.
