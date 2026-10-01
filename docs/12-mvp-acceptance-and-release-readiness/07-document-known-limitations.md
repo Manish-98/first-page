@@ -1,26 +1,23 @@
 # Story 12.7: Document known limitations
 
 ## Context
-This story belongs to Epic 12: MVP Acceptance and Release Readiness. It contributes to the MVP in a small, reviewable increment.
+Part of Epic 12: MVP Acceptance and Release Readiness. This is an independently reviewable increment toward the MVP.
 
 ## Goal
-Deliver document known limitations using the shared CV model and existing architectural boundaries.
+Deliver document known limitations with observable behavior that can be verified independently of adjacent stories.
 
 ## Acceptance criteria
-- [ ] The capability works as described by the story title and epic purpose.
-- [ ] Relevant state is represented consistently in the shared model and persists where applicable.
-- [ ] Empty, boundary, and failure states are handled explicitly; user content is not silently lost.
-- [ ] Appropriate unit, integration, or browser tests cover the expected path and meaningful edge cases.
-- [ ] Clean-code/layered-architecture guidelines are followed and the PR records verification steps and known limitations.
+- [ ] **Primary behavior:** Document current limitations for browser support, PDF fidelity, accessibility validation, and AI authorization with user impact and workarounds.
+- [ ] **Failure and boundary behavior:** A limitation without evidence is labeled unverified; fixed limitations are removed after validation.
+- [ ] **Scope boundary:** Do not claim universal rendering or formal accessibility guarantees.
+- [ ] **Verification evidence:** Add a focused automated test (unit, integration, or browser test as appropriate) asserting the input and expected result; include a manual preview check for browser, hosting, file handling, or download behavior.
 
-## Constraints
-- Keep the app local-first: explicit project save/open, no accounts/server-side CV storage, no hidden autosave/recovery copies.
-- Project files exclude API keys, tokens, and credentials.
-- Editing, saving, and PDF export must not require AI credentials.
-- AI features, when relevant, are opt-in, grounded in user-provided facts, and never silently applied.
+## Out of scope
+- Unrelated capabilities from other epics.
+- Changing local-first constraints without a separately documented product decision.
 
 ## Dependencies
-Depends on the release candidate and evidence from E1–E11. See the [MVP roadmap](../README.md); link dependency issues when implementation is authorized.
+See the [MVP roadmap](../README.md) and [Epic 12 overview](./00-epic-overview.md). Add dependency issue links when this story is converted into a GitHub issue.
 
-## Verification
-Test the expected path and failure cases. Validate the deployed feature preview before review/merge when preview infrastructure is available.
+## Verification notes
+Test the primary path and the named boundary case. Record commands/results in the PR and test the deployed feature preview when relevant.

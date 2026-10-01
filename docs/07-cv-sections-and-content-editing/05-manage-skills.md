@@ -1,26 +1,23 @@
 # Story 7.5: Manage skills
 
 ## Context
-This story belongs to Epic 7: CV Sections and Content Editing. It contributes to the MVP in a small, reviewable increment.
+Part of Epic 7: CV Sections and Content Editing. This is an independently reviewable increment toward the MVP.
 
 ## Goal
-Deliver manage skills using the shared CV model and existing architectural boundaries.
+Deliver manage skills with observable behavior that can be verified independently of adjacent stories.
 
 ## Acceptance criteria
-- [ ] The capability works as described by the story title and epic purpose.
-- [ ] Relevant state is represented consistently in the shared model and persists where applicable.
-- [ ] Empty, boundary, and failure states are handled explicitly; user content is not silently lost.
-- [ ] Appropriate unit, integration, or browser tests cover the expected path and meaningful edge cases.
-- [ ] Clean-code/layered-architecture guidelines are followed and the PR records verification steps and known limitations.
+- [ ] **Primary behavior:** Add, rename, reorder, and remove multiple skills; model, reopened project, and PDF reflect the final list in the same order.
+- [ ] **Failure and boundary behavior:** An empty skill value is clearly rejected or excluded without creating a phantom bullet.
+- [ ] **Scope boundary:** Do not silently rewrite or deduplicate user-provided skill names.
+- [ ] **Verification evidence:** Add a focused automated test (unit, integration, or browser test as appropriate) asserting the input and expected result; include a manual preview check for browser, hosting, file handling, or download behavior.
 
-## Constraints
-- Keep the app local-first: explicit project save/open, no accounts/server-side CV storage, no hidden autosave/recovery copies.
-- Project files exclude API keys, tokens, and credentials.
-- Editing, saving, and PDF export must not require AI credentials.
-- AI features, when relevant, are opt-in, grounded in user-provided facts, and never silently applied.
+## Out of scope
+- Unrelated capabilities from other epics.
+- Changing local-first constraints without a separately documented product decision.
 
 ## Dependencies
-Depends on E2 and E6. See the [MVP roadmap](../README.md); link dependency issues when implementation is authorized.
+See the [MVP roadmap](../README.md) and [Epic 7 overview](./00-epic-overview.md). Add dependency issue links when this story is converted into a GitHub issue.
 
-## Verification
-Test the expected path and failure cases. Validate the deployed feature preview before review/merge when preview infrastructure is available.
+## Verification notes
+Test the primary path and the named boundary case. Record commands/results in the PR and test the deployed feature preview when relevant.
