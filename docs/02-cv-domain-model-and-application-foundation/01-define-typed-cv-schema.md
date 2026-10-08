@@ -1,26 +1,23 @@
 # Story 2.1: Define typed CV schema
 
 ## Context
-This story belongs to Epic 2: CV Domain Model and Application Foundation. It contributes to the MVP in a small, reviewable increment.
+Part of Epic 2: CV Domain Model and Application Foundation. This is an independently reviewable increment toward the MVP.
 
 ## Goal
-Deliver define typed cv schema using the shared CV model and existing architectural boundaries.
+Deliver define typed cv schema with observable behavior that can be verified independently of adjacent stories.
 
 ## Acceptance criteria
-- [ ] The capability works as described by the story title and epic purpose.
-- [ ] Relevant state is represented consistently in the shared model and persists where applicable.
-- [ ] Empty, boundary, and failure states are handled explicitly; user content is not silently lost.
-- [ ] Appropriate unit, integration, or browser tests cover the expected path and meaningful edge cases.
-- [ ] Clean-code/layered-architecture guidelines are followed and the PR records verification steps and known limitations.
+- [ ] **Primary behavior:** Construct a CV document through the typed domain model and verify required document metadata plus the supported profile, summary, experience, education, skills, and additional-section structures are represented by explicit typed fields/types rather than untyped JSON.
+- [ ] **Failure and boundary behavior:** Attempt to construct or validate a document with a missing required field or invalid field type and verify schema validation rejects it before the invalid value reaches the application state.
+- [ ] **Scope boundary:** Do not use untyped project JSON as the source of truth for the application model, and do not defer the core document shape to schema migration logic from Story 2.5.
+- [ ] **Verification evidence:** Add type-level/unit tests covering a valid representative CV and invalid/missing required fields, and verify serialization/deserialization preserves the typed model without losing supported fields.
 
-## Constraints
-- Keep the app local-first: explicit project save/open, no accounts/server-side CV storage, no hidden autosave/recovery copies.
-- Project files exclude API keys, tokens, and credentials.
-- Editing, saving, and PDF export must not require AI credentials.
-- AI features, when relevant, are opt-in, grounded in user-provided facts, and never silently applied.
+## Out of scope
+- Unrelated capabilities from other epics.
+- Changing local-first constraints without a separately documented product decision.
 
 ## Dependencies
-Depends on E1. See the [MVP roadmap](../README.md); link dependency issues when implementation is authorized.
+See the [MVP roadmap](../README.md) and [Epic 2 overview](./00-epic-overview.md). Add dependency issue links when this story is converted into a GitHub issue.
 
-## Verification
-Test the expected path and failure cases. Validate the deployed feature preview before review/merge when preview infrastructure is available.
+## Verification notes
+Test valid and invalid typed documents at the schema boundary and record the assertions and serialization round-trip results in the PR.

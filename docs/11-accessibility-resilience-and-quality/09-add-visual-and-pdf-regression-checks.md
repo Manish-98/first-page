@@ -1,26 +1,23 @@
 # Story 11.9: Add visual and PDF regression checks
 
 ## Context
-This story belongs to Epic 11: Accessibility, Resilience, and Quality. It contributes to the MVP in a small, reviewable increment.
+Part of Epic 11: Accessibility, Resilience, and Quality. This is an independently reviewable increment toward the MVP.
 
 ## Goal
-Deliver add visual and pdf regression checks using the shared CV model and existing architectural boundaries.
+Deliver add visual and pdf regression checks with observable behavior that can be verified independently of adjacent stories.
 
 ## Acceptance criteria
-- [ ] The capability works as described by the story title and epic purpose.
-- [ ] Relevant state is represented consistently in the shared model and persists where applicable.
-- [ ] Empty, boundary, and failure states are handled explicitly; user content is not silently lost.
-- [ ] Appropriate unit, integration, or browser tests cover the expected path and meaningful edge cases.
-- [ ] Clean-code/layered-architecture guidelines are followed and the PR records verification steps and known limitations.
+- [ ] **Primary behavior:** Render deterministic CV fixtures to both page images and PDF output and compare each against checked-in baselines using documented pixel/text/layout tolerances; a matching fixture passes both comparisons.
+- [ ] **Failure and boundary behavior:** Intentionally change representative visual/layout or PDF output and verify the corresponding comparison fails and reports the affected fixture/output; restore the expected output and verify both checks pass.
+- [ ] **Scope boundary:** Do not treat a readable one-off PDF export or manual inspection as a regression test, and do not allow arbitrary output drift without updating a reviewed baseline.
+- [ ] **Verification evidence:** Check deterministic fixtures and baselines into the repository, run both comparison suites in CI, and record the comparison method and tolerances in the PR.
 
-## Constraints
-- Keep the app local-first: explicit project save/open, no accounts/server-side CV storage, no hidden autosave/recovery copies.
-- Project files exclude API keys, tokens, and credentials.
-- Editing, saving, and PDF export must not require AI credentials.
-- AI features, when relevant, are opt-in, grounded in user-provided facts, and never silently applied.
+## Out of scope
+- Unrelated capabilities from other epics.
+- Changing local-first constraints without a separately documented product decision.
 
 ## Dependencies
-Cross-cutting quality work for all epics. See the [MVP roadmap](../README.md); link dependency issues when implementation is authorized.
+See the [MVP roadmap](../README.md) and [Epic 11 overview](./00-epic-overview.md). Add dependency issue links when this story is converted into a GitHub issue.
 
-## Verification
-Test the expected path and failure cases. Validate the deployed feature preview before review/merge when preview infrastructure is available.
+## Verification notes
+Verify stable image and PDF baseline matches plus deliberate failures for each output type.

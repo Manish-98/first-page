@@ -1,26 +1,23 @@
 # Story 8.5: Add snapping and alignment guides
 
 ## Context
-This story belongs to Epic 8: Templates, Grid Layout, and Pagination. It contributes to the MVP in a small, reviewable increment.
+Part of Epic 8: Templates, Grid Layout, and Pagination. This is an independently reviewable increment toward the MVP.
 
 ## Goal
-Deliver add snapping and alignment guides using the shared CV model and existing architectural boundaries.
+Deliver add snapping and alignment guides with observable behavior that can be verified independently of adjacent stories.
 
 ## Acceptance criteria
-- [ ] The capability works as described by the story title and epic purpose.
-- [ ] Relevant state is represented consistently in the shared model and persists where applicable.
-- [ ] Empty, boundary, and failure states are handled explicitly; user content is not silently lost.
-- [ ] Appropriate unit, integration, or browser tests cover the expected path and meaningful edge cases.
-- [ ] Clean-code/layered-architecture guidelines are followed and the PR records verification steps and known limitations.
+- [ ] **Primary behavior:** Drag or move a layout item within the supported grid near a grid boundary or aligned peer edge; verify it snaps to the documented target when within the snap threshold and a visible alignment guide identifies the corresponding row, column, or edge while alignment is active.
+- [ ] **Failure and boundary behavior:** Move the same item outside the snap threshold and verify it can remain at the non-snapped position; moving or resizing it must not create unrestricted overlap that hides content.
+- [ ] **Scope boundary:** Do not satisfy this story with generic font, margin, spacing, or column controls alone, and do not introduce unrestricted freeform placement.
+- [ ] **Verification evidence:** Add an interaction test covering a near-threshold snap, a visible guide, and an outside-threshold position; verify the resulting layout persists through save/reopen.
 
-## Constraints
-- Keep the app local-first: explicit project save/open, no accounts/server-side CV storage, no hidden autosave/recovery copies.
-- Project files exclude API keys, tokens, and credentials.
-- Editing, saving, and PDF export must not require AI credentials.
-- AI features, when relevant, are opt-in, grounded in user-provided facts, and never silently applied.
+## Out of scope
+- Unrelated capabilities from other epics.
+- Changing local-first constraints without a separately documented product decision.
 
 ## Dependencies
-Depends on E2, E6, and E7. See the [MVP roadmap](../README.md); link dependency issues when implementation is authorized.
+See the [MVP roadmap](../README.md) and [Epic 8 overview](./00-epic-overview.md). Add dependency issue links when this story is converted into a GitHub issue.
 
-## Verification
-Test the expected path and failure cases. Validate the deployed feature preview before review/merge when preview infrastructure is available.
+## Verification notes
+Test the snapping threshold, guide visibility, and boundary behavior. Record the observed target and persistence result in the PR.

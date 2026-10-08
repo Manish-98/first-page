@@ -1,26 +1,23 @@
 # Story 9.5: Add pre-export checklist
 
 ## Context
-This story belongs to Epic 9: Guided Creation and Local Quality Checks. It contributes to the MVP in a small, reviewable increment.
+Part of Epic 9: Guided Creation and Local Quality Checks. This is an independently reviewable increment toward the MVP.
 
 ## Goal
-Deliver add pre-export checklist using the shared CV model and existing architectural boundaries.
+Deliver add pre-export checklist with observable behavior that can be verified independently of adjacent stories.
 
 ## Acceptance criteria
-- [ ] The capability works as described by the story title and epic purpose.
-- [ ] Relevant state is represented consistently in the shared model and persists where applicable.
-- [ ] Empty, boundary, and failure states are handled explicitly; user content is not silently lost.
-- [ ] Appropriate unit, integration, or browser tests cover the expected path and meaningful edge cases.
-- [ ] Clean-code/layered-architecture guidelines are followed and the PR records verification steps and known limitations.
+- [ ] **Primary behavior:** Open the pre-export checklist for a CV with at least one local quality issue and one passing check; verify the checklist is visible, lists each applicable check with pass/warning status and a useful explanation, and reflects the current document state.
+- [ ] **Failure and boundary behavior:** Fix the flagged issue and rerun/refresh the checklist; verify its status updates without invoking AI or network services. Export remains available when only advisory warnings remain.
+- [ ] **Scope boundary:** Do not substitute the checklist with a PDF export smoke test, and do not invent remote/AI checks for local quality rules.
+- [ ] **Verification evidence:** Add an automated test for checklist population and status updates from deterministic local checks, plus a browser/manual verification of the checklist immediately before export.
 
-## Constraints
-- Keep the app local-first: explicit project save/open, no accounts/server-side CV storage, no hidden autosave/recovery copies.
-- Project files exclude API keys, tokens, and credentials.
-- Editing, saving, and PDF export must not require AI credentials.
-- AI features, when relevant, are opt-in, grounded in user-provided facts, and never silently applied.
+## Out of scope
+- Unrelated capabilities from other epics.
+- Changing local-first constraints without a separately documented product decision.
 
 ## Dependencies
-Depends on E2 and E7. See the [MVP roadmap](../README.md); link dependency issues when implementation is authorized.
+See the [MVP roadmap](../README.md) and [Epic 9 overview](./00-epic-overview.md). Add dependency issue links when this story is converted into a GitHub issue.
 
-## Verification
-Test the expected path and failure cases. Validate the deployed feature preview before review/merge when preview infrastructure is available.
+## Verification notes
+Record the initial warning, the correction, and the updated checklist state in the PR.

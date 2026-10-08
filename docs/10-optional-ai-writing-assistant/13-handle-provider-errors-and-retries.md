@@ -1,26 +1,23 @@
 # Story 10.13: Handle provider errors and retries
 
 ## Context
-This story belongs to Epic 10: Optional AI Writing Assistant. It contributes to the MVP in a small, reviewable increment.
+Part of Epic 10: Optional AI Writing Assistant. This is an independently reviewable increment toward the MVP.
 
 ## Goal
-Deliver handle provider errors and retries using the shared CV model and existing architectural boundaries.
+Deliver handle provider errors and retries with observable behavior that can be verified independently of adjacent stories.
 
 ## Acceptance criteria
-- [ ] The capability works as described by the story title and epic purpose.
-- [ ] Relevant state is represented consistently in the shared model and persists where applicable.
-- [ ] Empty, boundary, and failure states are handled explicitly; user content is not silently lost.
-- [ ] Appropriate unit, integration, or browser tests cover the expected path and meaningful edge cases.
-- [ ] Clean-code/layered-architecture guidelines are followed and the PR records verification steps and known limitations.
+- [ ] **Primary behavior:** Simulate an AI provider failure during an explicit user action and verify the UI reports the failure, preserves the current document and any pending edits, and exposes a retry action plus a manual provider-switch action when another configured provider is available.
+- [ ] **Failure and boundary behavior:** Select retry after a transient failure and verify the request is attempted again and either succeeds with suggestions or reports the next failure without losing work; selecting manual switch uses the chosen provider rather than silently switching.
+- [ ] **Scope boundary:** Do not silently discard user edits, apply partial AI output after a failed request, or silently change providers.
+- [ ] **Verification evidence:** Add integration/browser tests with a fake provider that fails once then succeeds and another provider configured for manual switching; assert error UI, retry behavior, switch behavior, and unchanged source content after failure.
 
-## Constraints
-- Keep the app local-first: explicit project save/open, no accounts/server-side CV storage, no hidden autosave/recovery copies.
-- Project files exclude API keys, tokens, and credentials.
-- Editing, saving, and PDF export must not require AI credentials.
-- AI features, when relevant, are opt-in, grounded in user-provided facts, and never silently applied.
+## Out of scope
+- Unrelated capabilities from other epics.
+- Changing local-first constraints without a separately documented product decision.
 
 ## Dependencies
-Depends on E2 and E7; official authorization/security is a release gate. See the [MVP roadmap](../README.md); link dependency issues when implementation is authorized.
+See the [MVP roadmap](../README.md) and [Epic 10 overview](./00-epic-overview.md). Add dependency issue links when this story is converted into a GitHub issue.
 
-## Verification
-Test the expected path and failure cases. Validate the deployed feature preview before review/merge when preview infrastructure is available.
+## Verification notes
+Record the first failure, retry outcome, and manual-switch outcome in the PR.

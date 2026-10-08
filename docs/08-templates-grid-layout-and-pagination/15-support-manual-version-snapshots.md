@@ -1,26 +1,23 @@
 # Story 8.15: Support manual version snapshots
 
 ## Context
-This story belongs to Epic 8: Templates, Grid Layout, and Pagination. It contributes to the MVP in a small, reviewable increment.
+Part of Epic 8: Templates, Grid Layout, and Pagination. This is an independently reviewable increment toward the MVP.
 
 ## Goal
-Deliver support manual version snapshots using the shared CV model and existing architectural boundaries.
+Deliver support manual version snapshots with observable behavior that can be verified independently of adjacent stories.
 
 ## Acceptance criteria
-- [ ] The capability works as described by the story title and epic purpose.
-- [ ] Relevant state is represented consistently in the shared model and persists where applicable.
-- [ ] Empty, boundary, and failure states are handled explicitly; user content is not silently lost.
-- [ ] Appropriate unit, integration, or browser tests cover the expected path and meaningful edge cases.
-- [ ] Clean-code/layered-architecture guidelines are followed and the PR records verification steps and known limitations.
+- [ ] **Primary behavior:** Create a named/manual snapshot of the current CV content and design state, make subsequent content and layout edits, then restore the snapshot and verify the exact captured content and design state is restored.
+- [ ] **Failure and boundary behavior:** Attempt to restore an absent or invalid snapshot and verify a clear error with the current document unchanged; restoring an existing snapshot must not silently merge unrelated later edits into the snapshot.
+- [ ] **Scope boundary:** Do not satisfy this story with project schema migration, save/open, or automatic browser recovery; snapshot creation must be an explicit user action.
+- [ ] **Verification evidence:** Add an automated test covering create → edit → restore and invalid/absent snapshot cases, including assertions for both content and presentation state.
 
-## Constraints
-- Keep the app local-first: explicit project save/open, no accounts/server-side CV storage, no hidden autosave/recovery copies.
-- Project files exclude API keys, tokens, and credentials.
-- Editing, saving, and PDF export must not require AI credentials.
-- AI features, when relevant, are opt-in, grounded in user-provided facts, and never silently applied.
+## Out of scope
+- Unrelated capabilities from other epics.
+- Changing local-first constraints without a separately documented product decision.
 
 ## Dependencies
-Depends on E2, E6, and E7. See the [MVP roadmap](../README.md); link dependency issues when implementation is authorized.
+See the [MVP roadmap](../README.md) and [Epic 8 overview](./00-epic-overview.md). Add dependency issue links when this story is converted into a GitHub issue.
 
-## Verification
-Test the expected path and failure cases. Validate the deployed feature preview before review/merge when preview infrastructure is available.
+## Verification notes
+Record the snapshot identifier/name, the changes made after creation, and the exact restoration assertions in the PR.
