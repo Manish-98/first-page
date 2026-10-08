@@ -24,3 +24,13 @@ Initial foundation before broad feature work.
 - Core editing, explicit project save/open, local checks, and PDF export work without AI credentials.
 - No browser autosave, hidden recovery copies, accounts, or server-side CV storage without an explicit product decision.
 - Follow issue → branch → PR → checks/preview → preview test → review/approval → merge.
+
+## Delivery structure
+
+- Epic tracker: [Issue #9](https://github.com/Manish-98/first-page/issues/9)
+- Epic integration branch: `epic/1-engineering-foundation`
+- Epic pull request targets `main`.
+- Story work uses stacked pull requests when a story depends on an earlier story; independent stories may branch directly from the Epic branch and run as parallel pull requests.
+- Story pull requests target their immediate dependency branch when stacked, or `epic/1-engineering-foundation` when parallel.
+- Story branches and pull requests are kept focused on one story; the Epic branch is the integration point before merging the Epic into `main`.
+
