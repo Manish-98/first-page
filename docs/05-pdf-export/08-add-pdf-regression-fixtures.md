@@ -7,10 +7,10 @@ Part of Epic 5: PDF Export. This is an independently reviewable increment toward
 Deliver add pdf regression fixtures with observable behavior that can be verified independently of adjacent stories.
 
 ## Acceptance criteria
-- [ ] **Primary behavior:** Export a representative CV with a heading, long paragraph, Unicode, and enough content for two pages; verify a readable PDF, page size, reading order, and all source text.
-- [ ] **Failure and boundary behavior:** Simulate export failure; show an error, keep the document editable and unchanged, and allow retry.
-- [ ] **Scope boundary:** Do not claim success before a download is produced or silently truncate/shrink content.
-- [ ] **Verification evidence:** Add a focused automated test (unit, integration, or browser test as appropriate) asserting the input and expected result; include a manual preview check for browser, hosting, file handling, or download behavior.
+- [ ] **Primary behavior:** Store a deterministic CV fixture containing headings, long text, Unicode, and multi-page content together with a checked-in expected PDF/text/layout baseline; run an automated regression test that exports the fixture and compares the new result with that baseline using a documented deterministic comparison or tolerance.
+- [ ] **Failure and boundary behavior:** Intentionally alter a renderer output or fixture expectation and verify the regression test fails with a useful difference; restore the baseline and verify the test passes again.
+- [ ] **Scope boundary:** Do not treat a one-off manual PDF inspection as the regression fixture, and do not accept arbitrary output drift without an explicit updated baseline.
+- [ ] **Verification evidence:** Check the fixture and baseline into the repository, run the regression test in CI, and record the comparison method, tolerance (if any), and pass/fail evidence in the PR.
 
 ## Out of scope
 - Unrelated capabilities from other epics.
@@ -20,4 +20,4 @@ Deliver add pdf regression fixtures with observable behavior that can be verifie
 See the [MVP roadmap](../README.md) and [Epic 5 overview](./00-epic-overview.md). Add dependency issue links when this story is converted into a GitHub issue.
 
 ## Verification notes
-Test the primary path and the named boundary case. Record commands/results in the PR and test the deployed feature preview when relevant.
+Verify both a stable baseline match and a deliberate regression failure. Keep the fixture deterministic so later renderer changes are detectable.

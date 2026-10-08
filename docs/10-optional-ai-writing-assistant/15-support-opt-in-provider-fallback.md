@@ -7,10 +7,10 @@ Part of Epic 10: Optional AI Writing Assistant. This is an independently reviewa
 Deliver support opt-in provider fallback with observable behavior that can be verified independently of adjacent stories.
 
 ## Acceptance criteria
-- [ ] **Primary behavior:** Run the action explicitly on a fixture containing vague wording and no metrics; suggestions target the selected/current text and display original versus proposed wording.
-- [ ] **Failure and boundary behavior:** Rejecting or canceling leaves the source unchanged; accepting one suggestion applies only that suggestion; simulated provider failure preserves work.
-- [ ] **Scope boundary:** Do not invent dates, employers, metrics, qualifications, or achievements; no background calls or silent provider fallback.
-- [ ] **Verification evidence:** Add a focused automated test (unit, integration, or browser test as appropriate) asserting the input and expected result; include a manual preview check for browser, hosting, file handling, or download behavior.
+- [ ] **Primary behavior:** With fallback disabled, make the primary provider fail and verify no secondary provider is called and the user sees the primary failure. With fallback enabled, make the primary provider fail and verify the configured secondary provider is called and the user is explicitly told that fallback was used.
+- [ ] **Failure and boundary behavior:** If the secondary provider also fails, verify the combined failure is surfaced without mutating the source; disabling fallback after configuration must prevent the secondary call on the next primary failure.
+- [ ] **Scope boundary:** Fallback must be explicitly user-enabled and limited to configured providers; do not silently enable it or invent an unconfigured provider.
+- [ ] **Verification evidence:** Add tests with call-count/assertion spies for both disabled and enabled states, including primary failure, secondary invocation only when enabled, visible fallback disclosure, and dual-provider failure.
 
 ## Out of scope
 - Unrelated capabilities from other epics.
@@ -20,4 +20,4 @@ Deliver support opt-in provider fallback with observable behavior that can be ve
 See the [MVP roadmap](../README.md) and [Epic 10 overview](./00-epic-overview.md). Add dependency issue links when this story is converted into a GitHub issue.
 
 ## Verification notes
-Test the primary path and the named boundary case. Record commands/results in the PR and test the deployed feature preview when relevant.
+Record both fallback-disabled and fallback-enabled test results in the PR.

@@ -7,10 +7,10 @@ Part of Epic 1: Engineering Foundation and Delivery Pipeline. This is an indepen
 Deliver add github actions pr checks with observable behavior that can be verified independently of adjacent stories.
 
 ## Acceptance criteria
-- [ ] **Primary behavior:** Run documented checks on a clean change and verify formatting, lint, types, tests, and build report separately.
-- [ ] **Failure and boundary behavior:** Introduce a known type error or failing assertion and verify the corresponding check exits non-zero.
-- [ ] **Scope boundary:** Do not weaken/skip checks globally to obtain green CI.
-- [ ] **Verification evidence:** Add a focused automated test (unit, integration, or browser test as appropriate) asserting the input and expected result; include a manual preview check for browser, hosting, file handling, or download behavior.
+- [ ] **Primary behavior:** Open a pull request that changes a tracked application file and verify the PR-triggered GitHub Actions workflow starts automatically and reports separate formatting, lint, type-check, test, and build results for the commit.
+- [ ] **Failure and boundary behavior:** Introduce a known type error or failing assertion in a PR branch and verify the corresponding workflow check fails on GitHub and the PR does not report an all-green required-check result; restore the change and verify the checks pass again.
+- [ ] **Scope boundary:** Do not satisfy this story with local commands alone, and do not weaken, skip, or mark the workflow checks successful when a required command fails.
+- [ ] **Verification evidence:** Exercise the workflow on an actual PR commit, record the run URL and check conclusions in the PR, and retain the workflow configuration plus any required test command coverage.
 
 ## Out of scope
 - Unrelated capabilities from other epics.
@@ -20,4 +20,4 @@ Deliver add github actions pr checks with observable behavior that can be verifi
 See the [MVP roadmap](../README.md) and [Epic 1 overview](./00-epic-overview.md). Add dependency issue links when this story is converted into a GitHub issue.
 
 ## Verification notes
-Test the primary path and the named boundary case. Record commands/results in the PR and test the deployed feature preview when relevant.
+Test both a passing PR-triggered run and a deliberately failing PR-triggered run. Record the GitHub Actions results and any required-check configuration in the PR.

@@ -7,10 +7,10 @@ Part of Epic 11: Accessibility, Resilience, and Quality. This is an independentl
 Deliver add visual and pdf regression checks with observable behavior that can be verified independently of adjacent stories.
 
 ## Acceptance criteria
-- [ ] **Primary behavior:** Export a representative CV with a heading, long paragraph, Unicode, and enough content for two pages; verify a readable PDF, page size, reading order, and all source text.
-- [ ] **Failure and boundary behavior:** Simulate export failure; show an error, keep the document editable and unchanged, and allow retry.
-- [ ] **Scope boundary:** Do not claim success before a download is produced or silently truncate/shrink content.
-- [ ] **Verification evidence:** Add a focused automated test (unit, integration, or browser test as appropriate) asserting the input and expected result; include a manual preview check for browser, hosting, file handling, or download behavior.
+- [ ] **Primary behavior:** Render deterministic CV fixtures to both page images and PDF output and compare each against checked-in baselines using documented pixel/text/layout tolerances; a matching fixture passes both comparisons.
+- [ ] **Failure and boundary behavior:** Intentionally change representative visual/layout or PDF output and verify the corresponding comparison fails and reports the affected fixture/output; restore the expected output and verify both checks pass.
+- [ ] **Scope boundary:** Do not treat a readable one-off PDF export or manual inspection as a regression test, and do not allow arbitrary output drift without updating a reviewed baseline.
+- [ ] **Verification evidence:** Check deterministic fixtures and baselines into the repository, run both comparison suites in CI, and record the comparison method and tolerances in the PR.
 
 ## Out of scope
 - Unrelated capabilities from other epics.
@@ -20,4 +20,4 @@ Deliver add visual and pdf regression checks with observable behavior that can b
 See the [MVP roadmap](../README.md) and [Epic 11 overview](./00-epic-overview.md). Add dependency issue links when this story is converted into a GitHub issue.
 
 ## Verification notes
-Test the primary path and the named boundary case. Record commands/results in the PR and test the deployed feature preview when relevant.
+Verify stable image and PDF baseline matches plus deliberate failures for each output type.

@@ -7,10 +7,10 @@ Part of Epic 10: Optional AI Writing Assistant. This is an independently reviewa
 Deliver define provider-neutral ai contract with observable behavior that can be verified independently of adjacent stories.
 
 ## Acceptance criteria
-- [ ] **Primary behavior:** Run the action explicitly on a fixture containing vague wording and no metrics; suggestions target the selected/current text and display original versus proposed wording.
-- [ ] **Failure and boundary behavior:** Rejecting or canceling leaves the source unchanged; accepting one suggestion applies only that suggestion; simulated provider failure preserves work.
-- [ ] **Scope boundary:** Do not invent dates, employers, metrics, qualifications, or achievements; no background calls or silent provider fallback.
-- [ ] **Verification evidence:** Add a focused automated test (unit, integration, or browser test as appropriate) asserting the input and expected result; include a manual preview check for browser, hosting, file handling, or download behavior.
+- [ ] **Primary behavior:** Exercise a provider-neutral AI request/result/error contract with a fake provider implementation that is not OpenAI-specific; verify the application can send the defined request and consume normalized suggestions through the same interface.
+- [ ] **Failure and boundary behavior:** Have the fake provider return a defined provider error and verify the contract exposes a normalized error without mutating the source; swap in a second fake provider with the same contract and verify the application behavior remains unchanged.
+- [ ] **Scope boundary:** Do not make the domain/application contract depend on OpenAI request/response types, and do not satisfy this story only by calling an OpenAI adapter directly.
+- [ ] **Verification evidence:** Add contract tests using at least two fake providers, covering a successful suggestion response and a provider failure, with assertions on request shape, normalized result, and normalized error.
 
 ## Out of scope
 - Unrelated capabilities from other epics.
@@ -20,4 +20,4 @@ Deliver define provider-neutral ai contract with observable behavior that can be
 See the [MVP roadmap](../README.md) and [Epic 10 overview](./00-epic-overview.md). Add dependency issue links when this story is converted into a GitHub issue.
 
 ## Verification notes
-Test the primary path and the named boundary case. Record commands/results in the PR and test the deployed feature preview when relevant.
+Run the contract tests without network access or OpenAI credentials and record the fake-provider results in the PR.

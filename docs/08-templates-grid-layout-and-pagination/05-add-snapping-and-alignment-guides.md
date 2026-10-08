@@ -7,10 +7,10 @@ Part of Epic 8: Templates, Grid Layout, and Pagination. This is an independently
 Deliver add snapping and alignment guides with observable behavior that can be verified independently of adjacent stories.
 
 ## Acceptance criteria
-- [ ] **Primary behavior:** Change one supported layout/style value (for example, two-column proportion, font size, margin, or spacing) and verify the preview reflects the exact selected value.
-- [ ] **Failure and boundary behavior:** Save/reopen and export preserve the value; invalid/out-of-bounds values are rejected or warned about without hiding content.
-- [ ] **Scope boundary:** Do not support unrestricted overlapping/freeform placement in this story.
-- [ ] **Verification evidence:** Add a focused automated test (unit, integration, or browser test as appropriate) asserting the input and expected result; include a manual preview check for browser, hosting, file handling, or download behavior.
+- [ ] **Primary behavior:** Drag or move a layout item within the supported grid near a grid boundary or aligned peer edge; verify it snaps to the documented target when within the snap threshold and a visible alignment guide identifies the corresponding row, column, or edge while alignment is active.
+- [ ] **Failure and boundary behavior:** Move the same item outside the snap threshold and verify it can remain at the non-snapped position; moving or resizing it must not create unrestricted overlap that hides content.
+- [ ] **Scope boundary:** Do not satisfy this story with generic font, margin, spacing, or column controls alone, and do not introduce unrestricted freeform placement.
+- [ ] **Verification evidence:** Add an interaction test covering a near-threshold snap, a visible guide, and an outside-threshold position; verify the resulting layout persists through save/reopen.
 
 ## Out of scope
 - Unrelated capabilities from other epics.
@@ -20,4 +20,4 @@ Deliver add snapping and alignment guides with observable behavior that can be v
 See the [MVP roadmap](../README.md) and [Epic 8 overview](./00-epic-overview.md). Add dependency issue links when this story is converted into a GitHub issue.
 
 ## Verification notes
-Test the primary path and the named boundary case. Record commands/results in the PR and test the deployed feature preview when relevant.
+Test the snapping threshold, guide visibility, and boundary behavior. Record the observed target and persistence result in the PR.

@@ -7,10 +7,10 @@ Part of Epic 8: Templates, Grid Layout, and Pagination. This is an independently
 Deliver warn about layout and pagination changes with observable behavior that can be verified independently of adjacent stories.
 
 ## Acceptance criteria
-- [ ] **Primary behavior:** Use a CV whose long experience description crosses an A4 page boundary; verify content flows or a visible warning/override state appears.
-- [ ] **Failure and boundary behavior:** Save/reopen and export; no text is clipped or omitted and manual break/placement settings persist where supported.
-- [ ] **Scope boundary:** Do not silently shrink font size or hide content outside the printable area.
-- [ ] **Verification evidence:** Add a focused automated test (unit, integration, or browser test as appropriate) asserting the input and expected result; include a manual preview check for browser, hosting, file handling, or download behavior.
+- [ ] **Primary behavior:** Start with a CV that fits on one A4 page, make a supported layout change that causes content to cross the page boundary, and verify a visible pagination/layout-change warning identifies that the change affected pagination and offers the documented user action to continue, review, or revert.
+- [ ] **Failure and boundary behavior:** Dismiss or act on the warning and verify the resulting choice is honored; save/reopen and export the document without clipped or omitted text, and preserve manual break/placement settings where supported.
+- [ ] **Scope boundary:** Do not satisfy this story merely because content automatically flows to another page, and do not silently shrink text, hide content, or move content outside the printable area.
+- [ ] **Verification evidence:** Add an interaction test that deliberately changes pagination and asserts the warning and its action; record the resulting page count and user action in the PR.
 
 ## Out of scope
 - Unrelated capabilities from other epics.
@@ -20,4 +20,4 @@ Deliver warn about layout and pagination changes with observable behavior that c
 See the [MVP roadmap](../README.md) and [Epic 8 overview](./00-epic-overview.md). Add dependency issue links when this story is converted into a GitHub issue.
 
 ## Verification notes
-Test the primary path and the named boundary case. Record commands/results in the PR and test the deployed feature preview when relevant.
+Test an actual pagination-changing layout edit, the warning state, the user's response, and the resulting persisted/exported layout.

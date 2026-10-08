@@ -7,10 +7,10 @@ Part of Epic 8: Templates, Grid Layout, and Pagination. This is an independently
 Deliver support manual version snapshots with observable behavior that can be verified independently of adjacent stories.
 
 ## Acceptance criteria
-- [ ] **Primary behavior:** Save a current project and open a supported older-version fixture; migration preserves known content and writes/recognizes the declared version.
-- [ ] **Failure and boundary behavior:** A project declaring an unsupported future version is rejected before replacing the active document.
-- [ ] **Scope boundary:** Do not silently downgrade or reinterpret unknown versions.
-- [ ] **Verification evidence:** Add a focused automated test (unit, integration, or browser test as appropriate) asserting the input and expected result; include a manual preview check for browser, hosting, file handling, or download behavior.
+- [ ] **Primary behavior:** Create a named/manual snapshot of the current CV content and design state, make subsequent content and layout edits, then restore the snapshot and verify the exact captured content and design state is restored.
+- [ ] **Failure and boundary behavior:** Attempt to restore an absent or invalid snapshot and verify a clear error with the current document unchanged; restoring an existing snapshot must not silently merge unrelated later edits into the snapshot.
+- [ ] **Scope boundary:** Do not satisfy this story with project schema migration, save/open, or automatic browser recovery; snapshot creation must be an explicit user action.
+- [ ] **Verification evidence:** Add an automated test covering create → edit → restore and invalid/absent snapshot cases, including assertions for both content and presentation state.
 
 ## Out of scope
 - Unrelated capabilities from other epics.
@@ -20,4 +20,4 @@ Deliver support manual version snapshots with observable behavior that can be ve
 See the [MVP roadmap](../README.md) and [Epic 8 overview](./00-epic-overview.md). Add dependency issue links when this story is converted into a GitHub issue.
 
 ## Verification notes
-Test the primary path and the named boundary case. Record commands/results in the PR and test the deployed feature preview when relevant.
+Record the snapshot identifier/name, the changes made after creation, and the exact restoration assertions in the PR.
