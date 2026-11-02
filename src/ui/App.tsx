@@ -2,7 +2,7 @@ export default function App() {
   return (
     <main className="app-shell">
       <header className="app-header">
-        <a className="wordmark" href="/" aria-label="First Page home">
+        <a className="wordmark" href="./" aria-label="First Page home">
           first<span>page</span>
         </a>
         <span className="header-note">A considered space for your next chapter</span>
