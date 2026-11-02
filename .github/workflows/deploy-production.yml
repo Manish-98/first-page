@@ -11,6 +11,7 @@ on:
 # let every publish/cleanup event proceed without canceling a running publish.
 concurrency:
   group: github-pages-publish
+  queue: max
   cancel-in-progress: false
 
 permissions:
