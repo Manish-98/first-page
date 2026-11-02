@@ -1,6 +1,8 @@
+import ContentSection from "./ContentSection";
+
 export default function WelcomePanel() {
   return (
-    <section className="welcome" aria-labelledby="welcome-title">
+    <ContentSection className="welcome" labelledBy="welcome-title">
       <p className="eyebrow">CV BUILDER</p>
       <h1 id="welcome-title">
         Your experience, <em>beautifully</em> told.
@@ -13,6 +15,6 @@ export default function WelcomePanel() {
         Your workspace is ready for the next step. CV editing tools are coming
         soon.
       </p>
-    </section>
+    </ContentSection>
   );
 }
