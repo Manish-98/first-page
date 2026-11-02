@@ -29,4 +29,33 @@ export default tseslint.config(
     files: ["**/*.js"],
     languageOptions: { globals: globals.node },
   },
+  {
+    files: ["src/domain/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            { group: ["react", "react-dom", "vite", "**/application/**", "**/infrastructure/**", "**/ui/**"], message: "Domain must remain platform-independent and cannot depend on outer layers." },
+          ],
+        },
+      ],
+      "no-restricted-globals": ["error", "window", "document", "navigator", "localStorage", "sessionStorage", "indexedDB", "fetch"],
+    },
+  },
+  {
+    files: ["src/application/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            { group: ["react", "react-dom", "vite", "**/infrastructure/**", "**/ui/**"], message: "Application may depend on Domain and its own ports, not UI or concrete Infrastructure." },
+          ],
+        },
+      ],
+      "no-restricted-globals": ["error", "window", "document", "navigator", "localStorage", "sessionStorage", "indexedDB", "fetch"],
+    },
+  },
+
 );
