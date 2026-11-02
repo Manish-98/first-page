@@ -1,4 +1,4 @@
-import { Component, type ErrorInfo, type ReactNode } from "react";
+import { Component, type ReactNode } from "react";
 import AppFeedback from "./AppFeedback";
 
 type AppErrorBoundaryProps = {
@@ -17,11 +17,6 @@ export default class AppErrorBoundary extends Component<
 
   static getDerivedStateFromError(): AppErrorBoundaryState {
     return { hasError: true };
-  }
-
-  componentDidCatch(_error: Error, _errorInfo: ErrorInfo): void {
-    // The fallback is the local, privacy-preserving error report.
-    // Do not forward rendering errors or component details to a remote service.
   }
 
   private handleRetry = (): void => {
