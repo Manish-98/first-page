@@ -9,6 +9,7 @@ on:
 # be allowed to publish/clean up after the active run has finished.
 concurrency:
   group: github-pages-publish
+  queue: max
   cancel-in-progress: false
 
 permissions:
