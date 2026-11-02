@@ -5,6 +5,8 @@ on:
     types: [opened, synchronize, reopened, closed]
     branches: [main]
 
+# See deploy-production.yml: Pages updates share this lock. Every event must
+# be allowed to publish/clean up after the active run has finished.
 concurrency:
   group: github-pages-publish
   cancel-in-progress: false
