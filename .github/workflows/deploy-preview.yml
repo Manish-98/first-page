@@ -1,0 +1,129 @@
+name: Deploy PR Preview
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches: [main]
+
+concurrency:
+  group: github-pages-publish
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  preview:
+    # Avoid executing fork-controlled code while holding a write token.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out pull request
+        if: github.event.action != 'closed'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Set up Node.js
+        if: github.event.action != 'closed'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        if: github.event.action != 'closed'
+        run: npm ci
+
+      - name: Build preview
+        if: github.event.action != 'closed'
+        run: npm run build
+
+      - name: Check out or initialize Pages branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if git ls-remote --exit-code --heads origin gh-pages >/dev/null 2>&1; then
+            git clone --branch gh-pages --single-branch \
+              "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" \
+              ../pages-deploy
+          else
+            mkdir ../pages-deploy
+            cd ../pages-deploy
+            git init
+            git checkout --orphan gh-pages
+            git remote add origin \
+              "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          fi
+
+      - name: Publish or remove PR preview
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          ACTION: ${{ github.event.action }}
+        run: |
+          set -euo pipefail
+          preview_dir="../pages-deploy/pr-preview/pr-${PR_NUMBER}"
+
+          if [ "${ACTION}" = "closed" ]; then
+            rm -rf "${preview_dir}"
+          else
+            rm -rf "${preview_dir}"
+            mkdir -p "${preview_dir}"
+            cp -R dist/. "${preview_dir}/"
+            touch "${preview_dir}/.nojekyll"
+          fi
+
+          cd ../pages-deploy
+          touch .nojekyll
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Preview state is already up to date."
+            exit 0
+          fi
+
+          if [ "${ACTION}" = "closed" ]; then
+            git commit -m "deploy: remove PR preview #${PR_NUMBER}"
+          else
+            git commit -m "deploy: update PR preview #${PR_NUMBER}"
+          fi
+          git push origin HEAD:gh-pages
+
+      - name: Add preview URL to PR description
+        if: github.event.action != 'closed'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PREVIEW_URL: https://manish-98.github.io/first-page/pr-preview/pr-${{ github.event.pull_request.number }}/
+          MARKER: "<!-- pr-preview -->"
+        run: |
+          set -euo pipefail
+          body="$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}" --jq '.body // ""')"
+          base_body="$(printf '%s' "${body}" | awk -v marker="${MARKER}" '$0 == marker { exit } { print }')"
+          if [ -n "${base_body}" ]; then
+            base_body="${base_body}
+
+          "
+          fi
+          {
+            printf '%s' "${base_body}"
+            printf '%s\n' "${MARKER}" "## Preview" "" "[Open the latest preview deployment ↗](${PREVIEW_URL})" "" "Preview updates automatically when new commits are pushed to this PR."
+          } > pr-body.md
+          gh api --method PATCH "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}" -F body=@pr-body.md
+
+      - name: Remove preview URL from PR description
+        if: github.event.action == 'closed'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          MARKER: "<!-- pr-preview -->"
+        run: |
+          set -euo pipefail
+          body="$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}" --jq '.body // ""')"
+          base_body="$(printf '%s' "${body}" | awk -v marker="${MARKER}" '$0 == marker { exit } { print }')"
+          printf '%s' "${base_body}" > pr-body.md
+          gh api --method PATCH "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}" -F body=@pr-body.md
