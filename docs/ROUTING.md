@@ -16,7 +16,13 @@ rewrite rules for nested paths and pull-request preview URLs.
 | Hash route | Behavior |
 |---|---|
 | `#/` (also the initial empty hash) | Application welcome experience |
-| Any unrecognized hash route | Helpful not-found state with a home link |
+| Any unrecognized hash route | Helpful in-app not-found state with a home link |
+| Any unknown server path | Branded static `404.html` page copied into the deployment output by Vite |
+
+The static page lives at `public/404.html`, so Vite copies it unchanged to
+`dist/404.html` for GitHub Pages. Its home link returns to the production
+GitHub Pages project root. The in-app not-found state remains responsible for
+unknown hash routes, which do not trigger a server request.
 
 ## Navigation and history
 
