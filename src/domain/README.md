@@ -7,4 +7,4 @@ Rules:
 - No provider SDK or PDF-renderer dependencies.
 - Keep this layer independently testable in plain TypeScript.
 
-Add domain modules when an approved CV-domain issue requires them; do not add placeholder models here.
+The foundational CV document contracts are defined in [cv/](./cv/). Add further domain modules only when an approved issue requires them; do not add placeholder models.
