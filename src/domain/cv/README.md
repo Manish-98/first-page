@@ -43,7 +43,7 @@ This module defines the foundational, platform-independent CV document contracts
 - Repeating information is represented by the shared readonly `entries` collection. Each entry has its own stable `CVEntryId`.
 - Custom-field values are explicit and bounded; arbitrary objects and `any` are not accepted.
 - Arrays exposed by the document contracts are readonly to communicate immutable ownership.
-- Expected operation failures are values rather than exceptions. These operations do not perform broad runtime validation of arbitrary imported data; that remains an input-boundary responsibility.
+- Expected operation failures are values rather than exceptions. Built-in section operations also check the minimum required payload shape for the target section kind and return `entry-content-kind-mismatch` rather than accepting a payload from another section variant. Unknown extension kinds remain caller-defined; broad runtime validation of arbitrary imported data remains an input-boundary responsibility.
 
 ## Scope boundary
 
