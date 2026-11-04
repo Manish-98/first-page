@@ -1,4 +1,5 @@
 import type { CVDocument } from "../../domain/cv/types";
+import type { AdditionalStandardSectionKind } from "../../application/cv/updateCVStandardSections";
 import type { CVPartialDate, AwardSectionContent, CertificationSectionContent, InterestSectionContent, LanguageSectionContent, ProjectSectionContent, PublicationSectionContent, ReferenceSectionContent, VolunteeringSectionContent } from "../../domain/cv/sections";
 
 function safeLink(url: string | undefined): boolean {
@@ -17,15 +18,15 @@ function entries<T>(document: CVDocument, kind: string): T[] {
 function Lines({ values }: { values: readonly string[] | undefined }) {
   return values?.length ? <ul>{values.map((value,index) => <li key={index}>{value}</li>)}</ul> : null;
 }
-export default function AdditionalSectionsPreview({ document }: { document: CVDocument }) {
-  const projects = entries<ProjectSectionContent>(document,"projects");
-  const languages = entries<LanguageSectionContent>(document,"languages");
-  const certifications = entries<CertificationSectionContent>(document,"certifications");
-  const awards = entries<AwardSectionContent>(document,"awards");
-  const volunteering = entries<VolunteeringSectionContent>(document,"volunteering");
-  const publications = entries<PublicationSectionContent>(document,"publications");
-  const interests = entries<InterestSectionContent>(document,"interests");
-  const references = entries<ReferenceSectionContent>(document,"references");
+export default function AdditionalSectionsPreview({ document, kind }: { document: CVDocument; kind?: AdditionalStandardSectionKind }) {
+  const projects = (!kind || kind === "projects") ? entries<ProjectSectionContent>(document,"projects") : [];
+  const languages = (!kind || kind === "languages") ? entries<LanguageSectionContent>(document,"languages") : [];
+  const certifications = (!kind || kind === "certifications") ? entries<CertificationSectionContent>(document,"certifications") : [];
+  const awards = (!kind || kind === "awards") ? entries<AwardSectionContent>(document,"awards") : [];
+  const volunteering = (!kind || kind === "volunteering") ? entries<VolunteeringSectionContent>(document,"volunteering") : [];
+  const publications = (!kind || kind === "publications") ? entries<PublicationSectionContent>(document,"publications") : [];
+  const interests = (!kind || kind === "interests") ? entries<InterestSectionContent>(document,"interests") : [];
+  const references = (!kind || kind === "references") ? entries<ReferenceSectionContent>(document,"references") : [];
   const range = (value: { startDate?: CVPartialDate; endDate?: CVPartialDate; ongoing?: boolean } | undefined) =>
     [dateText(value?.startDate), value?.ongoing ? "Present" : dateText(value?.endDate)].filter(Boolean).join(" – ");
   return <>

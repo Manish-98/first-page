@@ -12,6 +12,7 @@ import ExperienceEditor from "./ExperienceEditor";
 import EducationEditor from "./EducationEditor";
 import SkillsEditor from "./SkillsEditor";
 import AdditionalStandardSectionsEditor from "./AdditionalStandardSectionsEditor";
+import CVSectionManager from "./CVSectionManager";
 
 interface Props { editingDependencies: CVCreationDependencies }
 const emptyDetails: PersonalDetails = {};
@@ -64,6 +65,12 @@ export default function CVDocumentPage({ editingDependencies }: Props) {
     }));
 
   function saveSectionDocument(updatedDocument: typeof activeDocument) {
+    const hadSummarySection = activeDocument.content.sections.some(section => section.kind === "summary");
+    const hasSummarySection = updatedDocument.content.sections.some(section => section.kind === "summary");
+    if (hadSummarySection && !hasSummarySection) {
+      setSummary("");
+      setSummaryError("");
+    }
     lastSavedForm.current = "section";
     setActiveCV(updatedDocument);
   }
@@ -150,6 +157,7 @@ export default function CVDocumentPage({ editingDependencies }: Props) {
               <button className="button button--primary" type="submit">Save summary</button>
             </form>
           </section>
+          <CVSectionManager document={activeDocument} editingDependencies={editingDependencies} onDocumentChange={saveSectionDocument} />
           <ExperienceEditor document={activeDocument} editingDependencies={editingDependencies} onDocumentChange={saveSectionDocument} />
           <EducationEditor document={activeDocument} editingDependencies={editingDependencies} onDocumentChange={saveSectionDocument} />
           <SkillsEditor document={activeDocument} editingDependencies={editingDependencies} onDocumentChange={saveSectionDocument} />
