@@ -29,6 +29,11 @@ export default function CVDocumentPage({ editingDependencies }: Props) {
   const lastSavedForm = useRef<"details" | "summary" | "section" | null>(null);
 
   useEffect(() => {
+    document.body.classList.add("cv-editor-active");
+    return () => document.body.classList.remove("cv-editor-active");
+  }, []);
+
+  useEffect(() => {
     if (!document) return;
     if (lastSavedForm.current !== "summary" && lastSavedForm.current !== "section") setDetails(document.content.personalDetails);
     const entry = document.content.sections.find(section => section.kind === "summary")?.entries[0];
