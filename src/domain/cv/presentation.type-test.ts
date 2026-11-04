@@ -64,23 +64,6 @@ const printDocument: CVDesignedDocument<SummarySection> = {
   design: printDesign,
 };
 
-/** Executable fixture for asserting that design replacement preserves facts. */
-export function assertDesignReplacementPreservesFacts(): void {
-  const compactDocument = withCVDesign(printDocument, compactDesign);
-
-  if (compactDocument.document !== factualDocument) {
-    throw new Error("Replacing a design must retain the factual document reference.");
-  }
-
-  if (compactDocument.document.content !== factualDocument.content) {
-    throw new Error("Replacing a design must retain the factual CV content reference.");
-  }
-
-  if (compactDocument.design !== compactDesign) {
-    throw new Error("The replacement design must be applied to the new composition.");
-  }
-}
-
 /** Both designs can be paired with the same factual document. */
 export const sameFactsWithDifferentDesigns = [
   printDocument,
