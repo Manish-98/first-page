@@ -46,7 +46,7 @@ function getAddressLines(document: CVDocument): string[] {
 function formatPartialDate(date: CVPartialDate | undefined): string | undefined {
   if (!date) return undefined;
   const month = date.month === undefined ? undefined : new Intl.DateTimeFormat("en", { month: "short" }).format(new Date(2000, date.month - 1, 1));
-  return [month, String(date.year)].filter(Boolean).join(" ");
+  return [date.day === undefined ? undefined : String(date.day), month, String(date.year)].filter(Boolean).join(" ");
 }
 
 function getExperienceEntries(document: CVDocument): ExperienceSectionContent[] {
@@ -159,7 +159,7 @@ export default function CVPreview({ document }: CVPreviewProps) {
           <div className="cv-preview__empty">
             <span aria-hidden="true">✦</span>
             <h3>Your CV will take shape here</h3>
-            <p>Save your name, contact details or professional summary to see them in this preview.</p>
+            <p>Save your details, professional summary or work experience to see them in this preview.</p>
           </div>
         )}
       </article>
