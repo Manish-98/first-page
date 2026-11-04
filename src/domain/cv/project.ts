@@ -70,7 +70,7 @@ const pageSizes = ["A3", "A4", "A5", "Letter", "Legal", "custom"] as const;
 const orientations = ["portrait", "landscape"] as const;
 const alignments = ["left", "center", "right", "justify"] as const;
 const measurementUnits = ["pt", "mm", "in"] as const;
-const sensitiveKeyPattern = /(?:api.?key|access.?token|refresh.?token|auth(?:orization)?|credential|password|secret|session|runtime.?state|transient.?state|cache)/i;
+const sensitiveKeyPattern = /^(?:api-key|access-token|refresh-token|authorization|auth|authentication|password|secret|credentials?|session|runtime-state|transient-state|cache)$/i;
 
 function isRecord(value: unknown): value is UnknownRecord {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -270,7 +270,7 @@ function findSensitiveFields(value: unknown, add: IssueAdder): void {
     } else {
       for (const [key, child] of Object.entries(current)) {
         const childPath = `${path}.${key}`;
-        if (sensitiveKeyPattern.test(key)) {
+        const normalizedKey = key.replace(/([a-z])([A-Z])/g, "$1-$2").replace(/_/g, "-");\n        if (sensitiveKeyPattern.test(normalizedKey)) {
           add("sensitive-data", "security", childPath, "Portable project data cannot contain credentials or transient runtime state.");
         } else {
           visit(child, childPath);
