@@ -270,7 +270,8 @@ function findSensitiveFields(value: unknown, add: IssueAdder): void {
     } else {
       for (const [key, child] of Object.entries(current)) {
         const childPath = `${path}.${key}`;
-        const normalizedKey = key.replace(/([a-z])([A-Z])/g, "$1-$2").replace(/_/g, "-");\n        if (sensitiveKeyPattern.test(normalizedKey)) {
+        const normalizedKey = key.replace(/([a-z])([A-Z])/g, "$1-$2").replace(/_/g, "-");
+        if (sensitiveKeyPattern.test(normalizedKey)) {
           add("sensitive-data", "security", childPath, "Portable project data cannot contain credentials or transient runtime state.");
         } else {
           visit(child, childPath);
