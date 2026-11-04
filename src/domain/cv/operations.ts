@@ -35,12 +35,6 @@ function matchesSectionKind(kind: string, content: unknown): boolean {
   return required.every(key => key in content) &&
     (kind !== "custom" || Array.isArray((content as { fields?: unknown }).fields));
 }
-function contentMismatch(documentId: CVDocumentId, sectionId: CVSectionId, entryId: CVEntryId): CVOperationResult<never> {
-  return failure("entry-content-kind-mismatch", `Entry '${entryId}' does not contain the required content for section kind '${sectionKindFor(documentId, sectionId)}'.`, { documentId, sectionId, entryId });
-}
-function sectionKindFor<T extends CVSection>(documentId: CVDocumentId, sectionId: CVSectionId): string {
-  return documentId.length >= 0 ? sectionId : sectionId;
-}
 function validateEntryContent<T extends CVSection>(doc: CVDocument<T>, section: T, entry: CVSectionEntry<unknown>): CVOperationResult<never> | undefined {
   if (matchesSectionKind(section.kind, entry.content)) return undefined;
   return failure("entry-content-kind-mismatch", `Entry '${entry.id}' does not contain the required content for section kind '${section.kind}'.`, { documentId: doc.id, sectionId: section.id, entryId: entry.id });
