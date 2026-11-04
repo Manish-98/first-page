@@ -72,7 +72,7 @@ describe("CVEditorWorkspace", () => {
 
     expect(screen.getByRole("dialog", { name: "Tools and sections" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Close" })).toHaveFocus();
-    expect(screen.getByRole("article", { name: "Document canvas" })).toHaveAttribute("aria-hidden", "true");
+    expect(screen.getByRole("article", { name: "Document canvas", hidden: true })).toHaveAttribute("aria-hidden", "true");
 
     fireEvent.keyDown(document, { key: "Escape" });
     expect(screen.queryByRole("dialog", { name: "Tools and sections" })).not.toBeInTheDocument();
