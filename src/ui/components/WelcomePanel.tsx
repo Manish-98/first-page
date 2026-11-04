@@ -1,3 +1,4 @@
+import AppLink from "./AppLink";
 import ContentSection from "./ContentSection";
 
 export default function WelcomePanel() {
@@ -8,13 +9,12 @@ export default function WelcomePanel() {
         Your experience, <em>beautifully</em> told.
       </h1>
       <p className="intro">
-        A focused workspace for shaping your next opportunity. Your CV stays
-        on your device, and you stay in control.
+        A focused workspace for shaping your next opportunity. Start with a
+        blank CV or take a guided first step.
       </p>
-      <p className="status-note" role="status">
-        Your workspace is ready for the next step. CV editing tools are coming
-        soon.
-      </p>
+      <AppLink className="home-create-link" variant="action" href="#/new-cv">
+        Create your CV
+      </AppLink>
     </ContentSection>
   );
 }

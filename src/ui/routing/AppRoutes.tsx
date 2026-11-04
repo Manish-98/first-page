@@ -1,9 +1,13 @@
 import { useSyncExternalStore } from "react";
 import NotFoundPage from "../components/NotFoundPage";
 import WelcomePanel from "../components/WelcomePanel";
+import NewCVPage from "../components/NewCVPage";
+import CVDocumentPage from "../components/CVDocumentPage";
 
 const routeTable = {
   "/": WelcomePanel,
+  "/new-cv": NewCVPage,
+  "/cv": CVDocumentPage,
 } as const;
 
 function getCurrentPath() {
