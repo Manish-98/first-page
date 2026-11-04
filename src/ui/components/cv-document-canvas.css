@@ -87,6 +87,3 @@
   white-space: nowrap;
   border: 0;
 }
-@media (max-width: 960px) {
-  .cv-document-canvas__page { max-width: 100%; }
-}
