@@ -24,8 +24,8 @@ describe("work experience editor", () => {
     fireEvent.click(screen.getByRole("button", { name: "Add experience" }));
     fireEvent.change(screen.getByLabelText(/Job title/), { target: { value: "Engineer" } });
     fireEvent.change(screen.getByLabelText("Employer"), { target: { value: "Example Ltd" } });
-    fireEvent.change(screen.getByLabelText("Year", { selector: 'input' }), { target: { value: "2022" } });
-    fireEvent.change(screen.getByLabelText("Month (optional)"), { target: { value: "4" } });
+    fireEvent.change(screen.getByLabelText("Start Year"), { target: { value: "2022" } });
+    fireEvent.change(screen.getByLabelText("Start Month (optional)"), { target: { value: "4" } });
     fireEvent.click(screen.getByLabelText("I currently work here"));
     fireEvent.click(screen.getByRole("button", { name: "Add experience" }));
     expect(getActiveCV()?.content.sections[0].entries[0].content).toMatchObject({
