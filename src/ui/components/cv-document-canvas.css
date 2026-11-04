@@ -11,8 +11,8 @@
 }
 .cv-document-canvas__page-content {
   position:absolute; top:var(--cv-page-margin); left:var(--cv-page-margin);
-  width:var(--cv-content-width); height:var(--cv-content-height);
-  overflow:hidden; pointer-events:none;
+  width:var(--cv-content-width); height:auto;
+  overflow:visible; pointer-events:none;
 }
 .cv-document-canvas__page-content .cv-preview-panel { position:static; width:100%; max-width:none; }
 .cv-document-canvas__page-content .cv-preview-panel__topline,
