@@ -1,10 +1,18 @@
 import { useSyncExternalStore } from "react";
+import type { CVCreationDependencies } from "../../application/cv/createCV";
 import NotFoundPage from "../components/NotFoundPage";
 import WelcomePanel from "../components/WelcomePanel";
+import NewCVPage from "../components/NewCVPage";
+import CVDocumentPage from "../components/CVDocumentPage";
 
 const routeTable = {
   "/": WelcomePanel,
+  "/cv": CVDocumentPage,
 } as const;
+
+interface AppRoutesProps {
+  cvCreationDependencies: CVCreationDependencies;
+}
 
 function getCurrentPath() {
   const hash = window.location.hash;
@@ -17,13 +25,17 @@ function subscribeToRouteChanges(onChange: () => void) {
   return () => window.removeEventListener("hashchange", onChange);
 }
 
-export default function AppRoutes() {
+export default function AppRoutes({ cvCreationDependencies }: AppRoutesProps) {
   const path = useSyncExternalStore(
     subscribeToRouteChanges,
     getCurrentPath,
     () => "/",
   );
-  const Route = routeTable[path as keyof typeof routeTable];
 
+  if (path === "/new-cv") {
+    return <NewCVPage creationDependencies={cvCreationDependencies} />;
+  }
+
+  const Route = routeTable[path as keyof typeof routeTable];
   return Route ? <Route /> : <NotFoundPage />;
 }
