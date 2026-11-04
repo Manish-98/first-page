@@ -23,7 +23,7 @@ describe("work experience editor", () => {
     render(<CVDocumentPage editingDependencies={dependencies} />);
     fireEvent.click(screen.getByRole("button", { name: "Add experience" }));
     fireEvent.change(screen.getByLabelText(/Job title/), { target: { value: "Engineer" } });
-    fireEvent.change(screen.getByLabelText("Employer"), { target: { value: "Example Ltd" } });
+    fireEvent.change(screen.getByLabelText(/Employer/), { target: { value: "Example Ltd" } });
     fireEvent.change(screen.getByLabelText("Start Year"), { target: { value: "2022" } });
     fireEvent.change(screen.getByLabelText("Start Month (optional)"), { target: { value: "4" } });
     fireEvent.click(screen.getByLabelText("I currently work here"));
@@ -34,7 +34,7 @@ describe("work experience editor", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: "Add experience" }));
     fireEvent.change(screen.getByLabelText(/Job title/), { target: { value: "Designer" } });
-    fireEvent.change(screen.getByLabelText("Employer"), { target: { value: "Studio" } });
+    fireEvent.change(screen.getByLabelText(/Employer/), { target: { value: "Studio" } });
     fireEvent.click(screen.getByRole("button", { name: "Add experience" }));
     expect(getActiveCV()?.content.sections[0].entries).toHaveLength(2);
   });
@@ -50,7 +50,8 @@ describe("work experience editor", () => {
       }] },
     });
     render(<CVDocumentPage editingDependencies={dependencies} />);
-    const first = screen.getByRole("listitem", { name: /Engineer/ });
+    const first = screen.getByRole("heading", { name: "Engineer", level: 3 }).closest("li");
+    if (!first) throw new Error("Experience list item was not rendered");
     fireEvent.click(within(first).getByRole("button", { name: "Edit" }));
     fireEvent.change(screen.getByLabelText(/Job title/), { target: { value: "Staff Engineer" } });
     fireEvent.click(screen.getByRole("button", { name: "Save experience" }));
@@ -65,7 +66,7 @@ describe("work experience editor", () => {
     render(<CVDocumentPage editingDependencies={dependencies} />);
     fireEvent.click(screen.getByRole("button", { name: "Add experience" }));
     fireEvent.change(screen.getByLabelText(/Job title/), { target: { value: "Engineer" } });
-    fireEvent.change(screen.getByLabelText("Employer"), { target: { value: "Example" } });
+    fireEvent.change(screen.getByLabelText(/Employer/), { target: { value: "Example" } });
     fireEvent.change(screen.getByLabelText("Start Month (optional)"), { target: { value: "13" } });
     fireEvent.click(screen.getByRole("button", { name: "Add experience" }));
     expect(screen.getByRole("alert")).toHaveTextContent(/month/i);
@@ -81,7 +82,7 @@ describe("work experience editor", () => {
     fireEvent.click(screen.getByRole("button", { name: "Save personal details" }));
     expect(screen.getByLabelText(/Job title/)).toHaveValue("Draft Engineer");
     expect(screen.getByRole("article", { name: "CV preview" })).not.toHaveTextContent("Draft Engineer");
-    fireEvent.change(screen.getByLabelText("Employer"), { target: { value: "Committed Co" } });
+    fireEvent.change(screen.getByLabelText(/Employer/), { target: { value: "Committed Co" } });
     fireEvent.click(screen.getByRole("button", { name: "Add experience" }));
     expect(screen.getByRole("article", { name: "CV preview" })).toHaveTextContent("Draft Engineer");
   });
