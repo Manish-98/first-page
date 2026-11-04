@@ -5,11 +5,10 @@ import type { CVSection } from "./types";
  * month/year without knowing the exact day. Numeric bounds are validated at
  * an untrusted-input boundary, not by these compile-time contracts.
  */
-export interface CVPartialDate {
-  year: number;
-  month?: number;
-  day?: number;
-}
+export type CVPartialDate =
+  | { year: number; month?: never; day?: never }
+  | { year: number; month: number; day?: never }
+  | { year: number; month: number; day: number };
 
 /**
  * An omitted end date can mean an incomplete record; ongoing is explicit so
