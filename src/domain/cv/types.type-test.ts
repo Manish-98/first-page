@@ -38,6 +38,43 @@ export function describeKnownSection(section: KnownSection): string {
   }
 }
 
+/**
+ * The root document must preserve a concrete section union. Narrowing by
+ * kind after reading through CVDocument must expose the corresponding payload.
+ */
+export const typedDocument: CVDocument<KnownSection> = {
+  id: "cv-typed",
+  metadata: {
+    title: "Typed CV",
+    createdAt: "2026-01-01T00:00:00.000Z",
+    updatedAt: "2026-01-01T00:00:00.000Z",
+  },
+  content: {
+    personalDetails: {},
+    sections: [
+      {
+        id: "summary-1",
+        kind: "summary",
+        entries: [{ id: "summary-entry-1", content: { text: "Summary" } }],
+      },
+      {
+        id: "experience-1",
+        kind: "experience",
+        entries: [
+          {
+            id: "experience-entry-1",
+            content: { employer: "Example Ltd", role: "Engineer" },
+          },
+        ],
+      },
+    ],
+  },
+};
+
+export function readTypedDocument(document: CVDocument<KnownSection>): string[] {
+  return document.content.sections.map((section) => describeKnownSection(section));
+}
+
 export const validDocumentShape = {
   id: "cv-1",
   metadata: {
