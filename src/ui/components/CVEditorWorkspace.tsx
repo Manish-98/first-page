@@ -18,11 +18,22 @@ export default function CVEditorWorkspace({ title, leftPanel, rightPanel, childr
   const [leftCollapsed, setLeftCollapsed] = useState(false);
   const [rightCollapsed, setRightCollapsed] = useState(false);
   const [activeDrawer, setActiveDrawer] = useState<Drawer>(null);
-  const isMobile = isNarrowViewport();
+  const [isMobile, setIsMobile] = useState(isNarrowViewport);
   const leftTriggerRef = useRef<HTMLButtonElement>(null);
   const rightTriggerRef = useRef<HTMLButtonElement>(null);
   const drawerCloseRef = useRef<HTMLButtonElement>(null);
   const drawerRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const updateViewport = () => {
+      const narrowViewport = isNarrowViewport();
+      setIsMobile(narrowViewport);
+      if (!narrowViewport) setActiveDrawer(null);
+    };
+
+    window.addEventListener("resize", updateViewport);
+    return () => window.removeEventListener("resize", updateViewport);
+  }, []);
 
   useEffect(() => {
     if (!isMobile || !activeDrawer) return;
