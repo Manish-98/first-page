@@ -348,6 +348,9 @@ function validateBuiltInEntry(
   if (kind === "projects" && "url" in content && typeof content.url === "string" && !isValidUrl(content.url)) {
     add("invalid-url", "format", `${path}.content.url`, "Project URL must be an absolute HTTP or HTTPS URL.", context);
   }
+  if (kind === "certifications" && "credentialUrl" in content && typeof content.credentialUrl === "string" && !isValidUrl(content.credentialUrl)) {
+    add("invalid-url", "format", `${path}.content.credentialUrl`, "Credential URL must be an absolute HTTP or HTTPS URL.", context);
+  }
   if (kind === "publications" && "url" in content && typeof content.url === "string" && !isValidUrl(content.url)) {
     add("invalid-url", "format", `${path}.content.url`, "Publication URL must be an absolute HTTP or HTTPS URL.", context);
   }
