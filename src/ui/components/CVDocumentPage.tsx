@@ -21,11 +21,11 @@ export default function CVDocumentPage({ editingDependencies }: Props) {
 
   useEffect(() => {
     if (!document) return;
-    if (lastSavedForm.current !== "details") setDetails(document.content.personalDetails);
+    if (lastSavedForm.current !== "summary") setDetails(document.content.personalDetails);
     const entry = document.content.sections.find(section => section.kind === "summary")?.entries[0];
     const text = entry?.content && typeof entry.content === "object" && "text" in entry.content
       ? String(entry.content.text) : "";
-    if (lastSavedForm.current !== "summary") setSummary(text);
+    if (lastSavedForm.current !== "details") setSummary(text);
     lastSavedForm.current = null;
   }, [document]);
 
