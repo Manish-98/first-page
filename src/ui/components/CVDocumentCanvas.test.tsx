@@ -19,8 +19,13 @@ describe("CVDocumentCanvas", () => {
       {id:"skills",kind:"skills",entries:[{id:"skill",content:{name:"TypeScript"}}]},
       {id:"summary",kind:"summary",entries:[{id:"summary-entry",content:{text:"Profile first"}}]},
     ])} />);
-    const flow=screen.getByRole("region",{name:"Paginated CV document"}).querySelector(".cv-document-canvas__page-flow");
-    expect(flow?.textContent?.indexOf("Skills")).toBeLessThan(flow?.textContent?.indexOf("Professional Summary") ?? -1);
+    const content=screen.getByRole("region",{name:"Paginated CV document"}).querySelector(".cv-document-canvas__accessible-content");
+    expect(content).not.toBeNull();
+    const renderedText=content?.textContent ?? "";
+    const skillsIndex=renderedText.indexOf("Skills");
+    const summaryIndex=renderedText.indexOf("Professional Summary");
+    expect(skillsIndex).toBeGreaterThanOrEqual(0);
+    expect(summaryIndex).toBeGreaterThan(skillsIndex);
   });
   it("updates the page count when content overflows", () => {
     const original=Object.getOwnPropertyDescriptor(HTMLElement.prototype,"scrollHeight");
