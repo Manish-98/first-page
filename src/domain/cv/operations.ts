@@ -168,4 +168,4 @@ export function duplicateEntry<T extends CVSection>(doc: CVDocument<T>, sid: CVS
   if (!source) return failure("entry-not-found", `Entry '${sourceId}' was not found.`, { documentId: doc.id, sectionId: sid, entryId: sourceId });
   return addEntry(doc, sid, { ...source, id: newId }, at, index);
 }
-export { updateCustomField } from "./custom-field-operations";
+export { addCustomField, removeCustomField, updateCustomField } from "./custom-field-operations";
