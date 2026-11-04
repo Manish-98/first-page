@@ -80,6 +80,31 @@ describe("CVDocumentPage", () => {
   });
 
 
+  it("preserves personal and summary drafts when education and skills are saved", () => {
+    setActiveCV(fixture());
+    render(<CVDocumentPage editingDependencies={dependencies} />);
+
+    fireEvent.change(screen.getByLabelText("Given name"), { target: { value: "Unsaved Ada" } });
+    fireEvent.change(screen.getByLabelText("Summary"), { target: { value: "Unsaved summary" } });
+
+    fireEvent.click(screen.getByRole("button", { name: "Add education" }));
+    fireEvent.change(screen.getByLabelText(/Institution/), { target: { value: "Example University" } });
+    fireEvent.change(screen.getByLabelText(/Qualification/), { target: { value: "BSc" } });
+    fireEvent.click(screen.getByRole("button", { name: "Add education" }));
+
+    expect(screen.getByLabelText("Given name")).toHaveValue("Unsaved Ada");
+    expect(screen.getByLabelText("Summary")).toHaveValue("Unsaved summary");
+
+    fireEvent.click(screen.getByRole("button", { name: "Add skill" }));
+    fireEvent.change(screen.getByLabelText(/Skill name/), { target: { value: "TypeScript" } });
+    fireEvent.click(screen.getByRole("button", { name: "Add skill" }));
+
+    expect(screen.getByLabelText("Given name")).toHaveValue("Unsaved Ada");
+    expect(screen.getByLabelText("Summary")).toHaveValue("Unsaved summary");
+    expect(getActiveCV()?.content.sections.find(section => section.kind === "education")?.entries).toHaveLength(1);
+    expect(getActiveCV()?.content.sections.find(section => section.kind === "skills")?.entries).toHaveLength(1);
+  });
+
   it("shows only committed details and summary in the live preview", () => {
     setActiveCV(fixture());
     render(<CVDocumentPage editingDependencies={dependencies} />);
