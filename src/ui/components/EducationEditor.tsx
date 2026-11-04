@@ -3,9 +3,8 @@ import type { CVDocument } from "../../domain/cv/types";
 import type { CVPartialDate, EducationSectionContent } from "../../domain/cv/sections";
 import type { CVCreationDependencies } from "../../application/cv/createCV";
 import { getEducationEntries, removeCVEducation, saveCVEducation } from "../../application/cv/updateCVEducation";
-import { setActiveCV } from "../../application/cv/cvSession";
 
-interface Props { document: CVDocument; editingDependencies: CVCreationDependencies }
+interface Props { document: CVDocument; editingDependencies: CVCreationDependencies; onDocumentChange: (document: CVDocument) => void }
 interface Draft {
   institution: string; qualification: string; fieldOfStudy: string; location: string;
   startYear: string; startMonth: string; startDay: string; endYear: string; endMonth: string; endDay: string;
@@ -43,7 +42,7 @@ function showDate(date: CVPartialDate | undefined): string {
   return [date.day,date.month,date.year].filter(value=>value!==undefined).join("/");
 }
 
-export default function EducationEditor({document,editingDependencies}:Props){
+export default function EducationEditor({document,editingDependencies,onDocumentChange}:Props){
   const [draft,setDraft]=useState<Draft>(emptyDraft);
   const [editingId,setEditingId]=useState<string|undefined>();
   const [fieldErrors,setFieldErrors]=useState<Record<string,string>>({});
@@ -63,9 +62,9 @@ export default function EducationEditor({document,editingDependencies}:Props){
       grade:draft.grade,description:draft.description,
     },editingDependencies);
     if(!result.ok){setFieldErrors({...errors,...result.fieldErrors});return;}
-    setActiveCV(result.document);reset();
+    onDocumentChange(result.document);reset();
   }
-  function remove(id:string){const result=removeCVEducation(document,id,editingDependencies);if(!result.ok){setFieldErrors(result.fieldErrors);return;}setActiveCV(result.document);if(editingId===id)reset();}
+  function remove(id:string){const result=removeCVEducation(document,id,editingDependencies);if(!result.ok){setFieldErrors(result.fieldErrors);return;}onDocumentChange(result.document);if(editingId===id)reset();}
   const dateField=(prefix:"start"|"end",part:"Year"|"Month"|"Day",hint:string)=>{
     const key=(prefix+part) as keyof Draft, errorKey="dateRange."+prefix+"Date";
     return <label className="cv-field education-date-field"><span>{prefix==="start"?"Start ":"End "}{part}{part!=="Year"?" (optional)":""}</span><input type="number" min={1} max={part==="Year"?9999:part==="Month"?12:31} step="1" inputMode="numeric" placeholder={hint} value={draft[key] as string} disabled={prefix==="end"&&draft.ongoing} onChange={event=>update(key,event.target.value as never)} aria-invalid={Boolean(fieldErrors[errorKey])} /></label>;
