@@ -185,8 +185,6 @@ export default function CVDocumentPage({ editingDependencies }: Props) {
         )}
       >
         <CVDocumentCanvas document={activeDocument} />
-          <CVPreview document={activeDocument} />
-        </div>
       </CVEditorWorkspace>
     </div>
   );
