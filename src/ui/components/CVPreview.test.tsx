@@ -67,6 +67,33 @@ describe("CVPreview", () => {
     expect(screen.getByText(/First line/)).toHaveClass("cv-preview__summary");
   });
 
+  it("renders committed work experience including dates, responsibilities and achievements", () => {
+    render(<CVPreview document={fixture({
+      personalDetails: {},
+      sections: [{
+        id: "experience-section",
+        kind: "experience",
+        entries: [{
+          id: "experience-entry",
+          content: {
+            role: "Senior Engineer",
+            employer: "Example Ltd",
+            location: "Pune",
+            dateRange: { startDate: { year: 2021, month: 4 }, ongoing: true },
+            responsibilities: ["Designed APIs"],
+            achievements: ["Reduced latency by 30%"],
+          },
+        }],
+      }],
+    })} />);
+    const preview = screen.getByRole("article", { name: "CV preview" });
+    expect(preview).toHaveTextContent("Senior Engineer");
+    expect(preview).toHaveTextContent("Example Ltd");
+    expect(preview).toHaveTextContent("Apr 2021 – Present");
+    expect(preview).toHaveTextContent("Designed APIs");
+    expect(preview).toHaveTextContent("Reduced latency by 30%");
+  });
+
   it("does not create unsafe external links from malformed URLs", () => {
     render(<CVPreview document={fixture({
       personalDetails: { contact: {
