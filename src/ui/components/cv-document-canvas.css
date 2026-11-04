@@ -21,7 +21,7 @@
   box-sizing:border-box; width:100%; max-width:none; min-height:0; height:auto;
   margin:0; padding:0; border:0; border-radius:0; background:transparent; box-shadow:none;
   overflow:visible; font-size:10pt; line-height:1.4;
-  transform:translateY(calc(var(--page-offset) * var(--cv-content-height) * -1));
+  transform:none;
 }
 .cv-document-canvas__page-content .cv-preview__section { break-inside:auto; }
 .cv-document-canvas__page-content .cv-preview__section h4,
