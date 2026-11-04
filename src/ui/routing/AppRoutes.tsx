@@ -36,6 +36,8 @@ export default function AppRoutes({ cvCreationDependencies }: AppRoutesProps) {
     return <NewCVPage creationDependencies={cvCreationDependencies} />;
   }
 
+  if (path === "/cv") return <CVDocumentPage editingDependencies={cvCreationDependencies} />;
+
   const Route = routeTable[path as keyof typeof routeTable];
   return Route ? <Route /> : <NotFoundPage />;
 }
