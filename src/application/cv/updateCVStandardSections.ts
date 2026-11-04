@@ -37,7 +37,8 @@ function validationErrors(document: CVDocument, entryId: string): Record<string,
   for (const issue of validateCVDocument(document).issues) {
     if (issue.entryId !== entryId) continue;
     const marker = ".content.";
-    const path = issue.path.includes(marker) ? issue.path.split(marker).pop() ?? "form" : "form";
+    const rawPath = issue.path.includes(marker) ? issue.path.split(marker).pop() ?? "form" : "form";
+    const path = rawPath.startsWith("dateRange.") ? rawPath.slice("dateRange.".length) : rawPath;
     errors[path] ??= issue.message;
   }
   return errors;

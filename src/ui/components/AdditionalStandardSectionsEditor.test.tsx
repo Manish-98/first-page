@@ -52,6 +52,17 @@ describe("additional standard section editors", () => {
     expect(getActiveCV()?.content.sections.find(section => section.kind === "certifications")?.entries[0].content).toMatchObject({ name: "Cloud", issuedOn: { year: 2024, month: 6 } });
   });
 
+  it("highlights invalid calendar dates in project date ranges", () => {
+    setActiveCV(fixture());
+    render(<CVDocumentPage editingDependencies={dependencies} />);
+    fireEvent.click(screen.getByRole("button", { name: "Add project" }));
+    fireEvent.change(screen.getByLabelText("Project name *"), { target: { value: "Atlas" } });
+    fireEvent.change(screen.getByLabelText(/Start date/), { target: { value: "2024-02-30" } });
+    fireEvent.click(screen.getByRole("button", { name: "Add entry" }));
+    expect(screen.getByText("Start date must contain a valid year and optional month/day.")).toBeInTheDocument();
+    expect(getActiveCV()?.content.sections).toEqual([]);
+  });
+
   it("preserves personal and summary drafts when an additional section is saved", () => {
     setActiveCV(fixture());
     render(<CVDocumentPage editingDependencies={dependencies} />);
