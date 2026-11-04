@@ -696,3 +696,16 @@ h1 em { color: var(--color-accent); font-weight: 400; }
   .experience-entry { flex-direction: column; }
   .experience-entry__actions { justify-content: flex-start; }
 }
+
+
+/* Education and skills editors */
+.education-date-field input { width: 100%; }
+.cv-preview__education { margin-top: 16px; }
+.cv-preview__education h5 { margin: 0 0 4px; font-family: var(--font-display); font-size: 1.08rem; font-weight: 600; }
+.cv-preview__skills { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 16px; margin: 0; padding: 0; list-style: none; }
+.cv-preview__skills li { display: flex; min-width: 0; flex-direction: column; gap: 3px; padding: 8px 0; border-bottom: 1px solid var(--color-border); }
+.cv-preview__skills strong { font-size: .88rem; }
+.cv-preview__skills span { color: var(--color-muted); font-size: .76rem; line-height: 1.45; overflow-wrap: anywhere; }
+@media (max-width: 620px) {
+  .cv-preview__skills { grid-template-columns: 1fr; }
+}

@@ -94,6 +94,33 @@ describe("CVPreview", () => {
     expect(preview).toHaveTextContent("Reduced latency by 30%");
   });
 
+  it("renders committed education and skills while omitting blank optional values", () => {
+    render(<CVPreview document={fixture({
+      personalDetails: {},
+      sections: [
+        { id: "education", kind: "education", entries: [{ id: "degree", content: {
+          institution: "Example University", qualification: "BSc", fieldOfStudy: "Computer Science",
+          dateRange: { startDate: { year: 2021 }, endDate: { year: 2024 }, ongoing: false },
+          grade: "First Class", description: "Focused on software engineering",
+        } }] },
+        { id: "skills", kind: "skills", entries: [{ id: "skill", content: {
+          name: "TypeScript", level: "advanced", category: "Engineering", keywords: ["typed systems", "APIs"],
+        } }, { id: "skill-2", content: { name: "React" } }] },
+      ],
+    })} />);
+    const preview = screen.getByRole("article", { name: "CV preview" });
+    expect(preview).toHaveTextContent("Education");
+    expect(preview).toHaveTextContent("BSc · Computer Science");
+    expect(preview).toHaveTextContent("Example University");
+    expect(preview).toHaveTextContent("2021 – 2024");
+    expect(preview).toHaveTextContent("First Class");
+    expect(preview).toHaveTextContent("Skills");
+    expect(preview).toHaveTextContent("TypeScript");
+    expect(preview).toHaveTextContent("Advanced");
+    expect(preview).toHaveTextContent("typed systems · APIs");
+    expect(preview).not.toHaveTextContent("undefined");
+  });
+
   it("does not create unsafe external links from malformed URLs", () => {
     render(<CVPreview document={fixture({
       personalDetails: { contact: {

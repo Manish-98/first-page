@@ -9,6 +9,8 @@ import AppLink from "./AppLink";
 import ContentSection from "./ContentSection";
 import CVPreview from "./CVPreview";
 import ExperienceEditor from "./ExperienceEditor";
+import EducationEditor from "./EducationEditor";
+import SkillsEditor from "./SkillsEditor";
 
 interface Props { editingDependencies: CVCreationDependencies }
 const emptyDetails: PersonalDetails = {};
@@ -19,15 +21,15 @@ export default function CVDocumentPage({ editingDependencies }: Props) {
   const [summary, setSummary] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [summaryError, setSummaryError] = useState("");
-  const lastSavedForm = useRef<"details" | "summary" | null>(null);
+  const lastSavedForm = useRef<"details" | "summary" | "section" | null>(null);
 
   useEffect(() => {
     if (!document) return;
-    if (lastSavedForm.current !== "summary") setDetails(document.content.personalDetails);
+    if (lastSavedForm.current !== "summary" && lastSavedForm.current !== "section") setDetails(document.content.personalDetails);
     const entry = document.content.sections.find(section => section.kind === "summary")?.entries[0];
     const text = entry?.content && typeof entry.content === "object" && "text" in entry.content
       ? String(entry.content.text) : "";
-    if (lastSavedForm.current !== "details") setSummary(text);
+    if (lastSavedForm.current !== "details" && lastSavedForm.current !== "section") setSummary(text);
     lastSavedForm.current = null;
   }, [document]);
 
@@ -59,6 +61,11 @@ export default function CVDocumentPage({ editingDependencies }: Props) {
         profiles: (current.contact?.profiles ?? []).map((profile, i) => i === index ? { ...profile, [key]: value } : profile),
       },
     }));
+
+  function saveSectionDocument(updatedDocument: typeof activeDocument) {
+    lastSavedForm.current = "section";
+    setActiveCV(updatedDocument);
+  }
 
   function saveDetails(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -142,7 +149,9 @@ export default function CVDocumentPage({ editingDependencies }: Props) {
               <button className="button button--primary" type="submit">Save summary</button>
             </form>
           </section>
-          <ExperienceEditor document={activeDocument} editingDependencies={editingDependencies} />
+          <ExperienceEditor document={activeDocument} editingDependencies={editingDependencies} onDocumentChange={saveSectionDocument} />
+          <EducationEditor document={activeDocument} editingDependencies={editingDependencies} onDocumentChange={saveSectionDocument} />
+          <SkillsEditor document={activeDocument} editingDependencies={editingDependencies} onDocumentChange={saveSectionDocument} />
         </div>
         <CVPreview document={activeDocument} />
       </div>
