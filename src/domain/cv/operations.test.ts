@@ -37,6 +37,12 @@ describe("CV document operations", () => {
     expect(value(removeSection(doc, "summary", at)).content.sections).toEqual([experience]);
     expect(removeSection(doc, "missing", at)).toMatchObject({ ok: false, error: { code: "section-not-found" } });
   });
+  it("rejects payloads that do not match the target section kind", () => {
+    const experiencePayload = { role: "Engineer", employer: "Example Ltd" };
+    expect(addEntry(doc, "summary", { id: "wrong-add", content: experiencePayload }, at)).toMatchObject({ ok: false, error: { code: "entry-content-kind-mismatch", sectionId: "summary", entryId: "wrong-add" } });
+    expect(updateEntry(doc, "summary", "summary-entry", experiencePayload, at)).toMatchObject({ ok: false, error: { code: "entry-content-kind-mismatch", sectionId: "summary", entryId: "summary-entry" } });
+    expect(updateSection(doc, "summary", { entries: [{ id: "replacement", content: experiencePayload }] }, at)).toMatchObject({ ok: false, error: { code: "entry-content-kind-mismatch", sectionId: "summary", entryId: "replacement" } });
+  });
   it("adds, updates, duplicates and removes entries with caller-controlled IDs", () => {
     const added = value(addEntry(doc, "summary", { id: "second", content: { text: "Second" } }, at));
     expect(added.content.sections[0].entries.map(e => e.id)).toEqual(["summary-entry", "second"]);
