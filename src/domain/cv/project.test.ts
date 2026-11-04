@@ -212,6 +212,58 @@ describe("validateCVProject", () => {
   });
 
 
+  it("rejects compound credential names in nested extension payloads before export", () => {
+    const project = validProject();
+    const withCredentials = {
+      ...project,
+      document: {
+        ...project.document,
+        content: {
+          ...project.document.content,
+          sections: [
+            ...project.document.content.sections,
+            {
+              id: "credential-extension",
+              kind: "vendor.credentials",
+              entries: [{
+                id: "credential-entry",
+                content: {
+                  clientSecret: "client-secret-value",
+                  privateKey: "private-key-value",
+                  awsSecretAccessKey: "cloud-secret-value",
+                  githubToken: "access-token-value",
+                  private_key: "snake-case-private-key",
+                },
+              }],
+            },
+          ],
+        },
+      },
+    };
+
+    const expectedPaths = [
+      "$.document.content.sections[3].entries[0].content.clientSecret",
+      "$.document.content.sections[3].entries[0].content.privateKey",
+      "$.document.content.sections[3].entries[0].content.awsSecretAccessKey",
+      "$.document.content.sections[3].entries[0].content.githubToken",
+      "$.document.content.sections[3].entries[0].content.private_key",
+    ];
+
+    const validation = validateCVProject(withCredentials);
+    for (const path of expectedPaths) {
+      expect(validation.issues).toEqual(expect.arrayContaining([
+        expect.objectContaining({ code: "sensitive-data", category: "security", path }),
+      ]));
+    }
+
+    expect(serializeCVProject(withCredentials as CVProject)).toMatchObject({
+      ok: false,
+      issues: expect.arrayContaining(expectedPaths.map(path =>
+        expect.objectContaining({ code: "sensitive-data", category: "security", path }),
+      )),
+    });
+  });
+
   it("rejects extension values that JSON would silently transform or discard", () => {
     const project = validProject();
     const document = {
