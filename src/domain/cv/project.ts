@@ -70,7 +70,7 @@ const pageSizes = ["A3", "A4", "A5", "Letter", "Legal", "custom"] as const;
 const orientations = ["portrait", "landscape"] as const;
 const alignments = ["left", "center", "right", "justify"] as const;
 const measurementUnits = ["pt", "mm", "in"] as const;
-const sensitiveKeyPattern = /(?:^|[-_])(?:api[-_]?key|private[-_]?key|access[-_]?token|refresh[-_]?token|id[-_]?token|bearer[-_]?token|token|authorization|auth|authentication|client[-_]?secret|secret|password|credentials?|session|runtime[-_]?state|transient[-_]?state|cache)(?:$|[-_])/i;
+const sensitiveKeyPattern = /(?:^|[-_])(?:api[-_]?key|private[-_]?key|access[-_]?token|refresh[-_]?token|id[-_]?token|bearer[-_]?token|token|authorization|auth|authentication|client[-_]?secret|secret|password|credentials|session|runtime[-_]?state|transient[-_]?state|cache)(?:$|[-_])/i;
 
 function isRecord(value: unknown): value is UnknownRecord {
   return typeof value === "object" && value !== null && !Array.isArray(value);
