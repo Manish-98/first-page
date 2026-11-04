@@ -25,7 +25,7 @@ export default function CVDocumentCanvas({ document }: { document: CVDocument })
     if (article) observer.observe(article);
     return () => observer.disconnect();
   }, [document]);
-  const contentWidth = A4_CONTENT_WIDTH * pageCount + A4_COLUMN_GAP * (pageCount - 1);
+  const pageFlowWidth = A4_PAGE.width * pageCount + A4_COLUMN_GAP * (pageCount - 1);
   const style = {
     "--cv-page-width": String(A4_PAGE.width) + "px",
     "--cv-page-height": String(A4_PAGE.height) + "px",
@@ -34,7 +34,7 @@ export default function CVDocumentCanvas({ document }: { document: CVDocument })
     "--cv-content-height": String(A4_CONTENT_HEIGHT) + "px",
     "--cv-column-gap": String(A4_COLUMN_GAP) + "px",
     "--cv-page-count": pageCount,
-    "--cv-canvas-content-width": String(contentWidth) + "px",
+    "--cv-canvas-content-width": String(pageFlowWidth) + "px",
   } as CSSProperties;
   return <section className="cv-document-canvas" aria-label="Paginated CV document" style={style}>
     <div className="cv-document-canvas__heading"><h2>Document</h2>
