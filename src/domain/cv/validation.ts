@@ -92,8 +92,12 @@ function isValidCalendarDate(year: number, month: number, day: number): boolean 
   return day <= daysByMonth[month - 1];
 }
 
-function datePrecision(value: CVPartialDate): readonly [number, number, number] {
-  return [value.year, value.month ?? 1, value.day ?? 1];
+function comparePartialDates(left: CVPartialDate, right: CVPartialDate): number | undefined {
+  if (left.year !== right.year) return left.year - right.year;
+  if (left.month === undefined || right.month === undefined) return undefined;
+  if (left.month !== right.month) return left.month - right.month;
+  if (left.day === undefined || right.day === undefined) return undefined;
+  return left.day - right.day;
 }
 
 function isValidPartialDate(value: unknown): value is CVPartialDate {
@@ -232,11 +236,15 @@ export function validateCVDocument(input: unknown): CVValidationResult {
         }
         const entryId = isNonEmptyString(entry.id) ? entry.id : undefined;
         checkId(entry.id, `${entryPath}.id`, entryIds, "duplicate-identifier", { documentId, sectionId, entryId });
-        if (!("content" in entry) || !isRecord(entry.content)) {
-          add("invalid-type", "structure", `${entryPath}.content`, "Entry content must be an object.", { documentId, sectionId, entryId });
+        if (!("content" in entry)) {
+          add("missing-field", "structure", `${entryPath}.content`, "Entry content property is required.", { documentId, sectionId, entryId });
           return;
         }
         if (typeof section.kind === "string" && (builtInSectionKinds as readonly string[]).includes(section.kind)) {
+          if (!isRecord(entry.content)) {
+            add("invalid-type", "structure", `${entryPath}.content`, "Built-in section entry content must be an object.", { documentId, sectionId, entryId });
+            return;
+          }
           validateBuiltInEntry(section.kind as CVSectionKind, entry.content, entryPath, { documentId, sectionId, entryId }, add, customFieldIds);
         }
       });
@@ -349,14 +357,6 @@ function validateBuiltInEntry(
   if (kind === "custom") validateCustomFields(content.fields, `${path}.content.fields`, context, add, customFieldIds);
 }
 
-function comparePartialDates(left: CVPartialDate, right: CVPartialDate): number {
-  const a = datePrecision(left), b = datePrecision(right);
-  for (let index = 0; index < a.length; index++) {
-    if (a[index] !== b[index]) return a[index] - b[index];
-  }
-  return 0;
-}
-
 function validateDateRange(value: unknown, path: string, context: Omit<CVValidationIssue, "code" | "category" | "path" | "message">, add: IssueAdder): void {
   if (!isRecord(value)) {
     add("invalid-type", "structure", path, "Date range must be an object.", context);
@@ -366,8 +366,11 @@ function validateDateRange(value: unknown, path: string, context: Omit<CVValidat
   if ("endDate" in value && !isValidPartialDate(value.endDate)) add("invalid-date", "format", `${path}.endDate`, "End date must contain a valid year and optional month/day.", context);
   if ("ongoing" in value && typeof value.ongoing !== "boolean") add("invalid-type", "structure", `${path}.ongoing`, "Ongoing must be a boolean when provided.", context);
   if (value.ongoing === true && "endDate" in value) add("invalid-date-range", "invariant", `${path}.endDate`, "An ongoing date range cannot have an end date.", context);
-  if (isValidPartialDate(value.startDate) && isValidPartialDate(value.endDate) && comparePartialDates(value.endDate, value.startDate) < 0) {
-    add("invalid-date-range", "invariant", `${path}.endDate`, "End date cannot precede start date.", context);
+  if (isValidPartialDate(value.startDate) && isValidPartialDate(value.endDate)) {
+    const comparison = comparePartialDates(value.endDate, value.startDate);
+    if (comparison !== undefined && comparison < 0) {
+      add("invalid-date-range", "invariant", `${path}.endDate`, "End date cannot precede start date.", context);
+    }
   }
   if (Object.keys(value).some(key => !["startDate", "endDate", "ongoing"].includes(key))) {
     add("invalid-type", "structure", path, "Date range contains an unsupported property.", context);
