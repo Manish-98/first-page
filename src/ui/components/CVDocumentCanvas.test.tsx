@@ -29,6 +29,7 @@ describe("CVDocumentCanvas", () => {
     vi.stubGlobal("ResizeObserver",Observer);
     render(<CVDocumentCanvas document={fixture()} />);
     expect(screen.getByText("2 pages · A4 portrait")).toBeInTheDocument();
+    expect(screen.getAllByRole("region",{name:"Paginated CV document"})[0].querySelectorAll(".cv-document-canvas__page-break")).toHaveLength(1);
     if(original) Object.defineProperty(HTMLElement.prototype,"scrollHeight",original);
     else Reflect.deleteProperty(HTMLElement.prototype,"scrollHeight");
     vi.unstubAllGlobals();
