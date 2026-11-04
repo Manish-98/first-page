@@ -25,7 +25,7 @@ describe("CVDocumentCanvas", () => {
   it("updates the page count when content overflows", () => {
     const original=Object.getOwnPropertyDescriptor(HTMLElement.prototype,"scrollHeight");
     Object.defineProperty(HTMLElement.prototype,"scrollHeight",{configurable:true,get:()=>1200});
-    class Observer { observe=vi.fn(); disconnect=vi.fn(); constructor(_callback:ResizeObserverCallback){} }
+    class Observer { observe=vi.fn(); disconnect=vi.fn(); }
     vi.stubGlobal("ResizeObserver",Observer);
     render(<CVDocumentCanvas document={fixture()} />);
     expect(screen.getByText("2 pages · A4 portrait")).toBeInTheDocument();
