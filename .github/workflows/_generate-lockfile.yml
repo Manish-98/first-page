@@ -30,4 +30,6 @@ jobs:
             exit 0
           fi
           git commit -m "chore: add npm lockfile"
+          git fetch origin chore/37-unit-test-infrastructure
+          git rebase origin/chore/37-unit-test-infrastructure
           git push origin HEAD:chore/37-unit-test-infrastructure
