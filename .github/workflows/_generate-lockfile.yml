@@ -1,15 +1,16 @@
 name: Generate lockfile (temporary)
 
 on:
-  push:
-    branches: [chore/37-unit-test-infrastructure]
-    paths: [package.json]
+  pull_request:
+    types: [opened, synchronize]
+    branches: [main]
 
 permissions:
   contents: write
 
 jobs:
   generate:
+    if: github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
