@@ -11,11 +11,10 @@ export default function CVDocumentCanvas({ document }: { document: CVDocument })
   useEffect(() => {
     const measure = () => {
       const article = measureRef.current?.querySelector<HTMLElement>(".cv-preview");
-      if (!article) return;
-      setPageCount(calculatePageCount(article.scrollHeight - A4_PAGE.margin * 2));
+      if (article) setPageCount(calculatePageCount(article.scrollHeight));
     };
     measure();
-    const article = measureRef.current?.querySelector(".cv-preview");
+    const article = measureRef.current?.querySelector<HTMLElement>(".cv-preview");
     if (typeof ResizeObserver === "undefined") {
       window.addEventListener("resize", measure);
       return () => window.removeEventListener("resize", measure);
@@ -31,7 +30,6 @@ export default function CVDocumentCanvas({ document }: { document: CVDocument })
     "--cv-page-margin": `${A4_PAGE.margin}px`,
     "--cv-content-width": `${A4_CONTENT_WIDTH}px`,
     "--cv-content-height": `${A4_CONTENT_HEIGHT}px`,
-    "--cv-page-count": pageCount,
   } as CSSProperties;
 
   return (
@@ -42,10 +40,23 @@ export default function CVDocumentCanvas({ document }: { document: CVDocument })
       </div>
       <div className="cv-document-canvas__viewport">
         <div className="cv-document-canvas__pages" data-page-count={pageCount}>
-          <div className="cv-document-canvas__flow">
-            <CVPreview document={document} />
-          </div>
+          {Array.from({ length: pageCount }, (_, index) => (
+            <article className="cv-document-canvas__page" aria-label={`Page ${index + 1} of ${pageCount}`} key={index}>
+              <div className="cv-document-canvas__page-content" aria-hidden="true">
+                <div
+                  className="cv-document-canvas__page-flow"
+                  style={{ top: `-${index * A4_CONTENT_HEIGHT}px` }}
+                >
+                  <CVPreview document={document} />
+                </div>
+              </div>
+              <span className="cv-document-canvas__page-number">{index + 1}</span>
+            </article>
+          ))}
         </div>
+      </div>
+      <div className="cv-document-canvas__accessible-content" aria-label="CV content for assistive technology">
+        <CVPreview document={document} />
       </div>
       <div className="cv-document-canvas__measure" ref={measureRef} aria-hidden="true" inert>
         <CVPreview document={document} />
