@@ -39,7 +39,12 @@ export default function CVDocumentCanvas({ document }: { document: CVDocument })
       <span aria-live="polite">{pageCount} {pageCount === 1 ? "page" : "pages"} · A4 portrait</span>
     </div>
     <div className="cv-document-canvas__viewport">
-      <div className="cv-document-canvas__page-flow" data-page-count={pageCount}><CVPreview document={document} /></div>
+      <div className="cv-document-canvas__page-flow" data-page-count={pageCount}>
+        <CVPreview document={document} />
+        {Array.from({ length: pageCount - 1 }, (_, index) => (
+          <div className="cv-document-canvas__page-break" key={index} style={{ "--page-number": index + 1 } as CSSProperties} aria-hidden="true" />
+        ))}
+      </div>
     </div>
     <div className="cv-document-canvas__measure" ref={measureRef} aria-hidden="true" inert><CVPreview document={document} /></div>
   </section>;
