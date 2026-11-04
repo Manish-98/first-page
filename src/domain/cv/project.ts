@@ -259,7 +259,20 @@ function findSensitiveFields(value: unknown, add: IssueAdder): void {
   const active = new WeakSet<object>();
 
   const visit = (current: unknown, path: string): void => {
+    if (current === undefined || typeof current === "function" ||
+        typeof current === "symbol" || typeof current === "bigint" ||
+        (typeof current === "number" && !Number.isFinite(current))) {
+      add("serialization-failed", "format", path, "Project values must be losslessly representable in JSON.");
+      return;
+    }
     if (typeof current !== "object" || current === null) return;
+    if (!Array.isArray(current)) {
+      const prototype = Object.getPrototypeOf(current) as unknown;
+      if (prototype !== Object.prototype && prototype !== null) {
+        add("serialization-failed", "format", path, "Project objects must use plain JSON object values.");
+        return;
+      }
+    }
     if (active.has(current)) {
       add("serialization-failed", "format", path, "Project data must not contain circular references.");
       return;
