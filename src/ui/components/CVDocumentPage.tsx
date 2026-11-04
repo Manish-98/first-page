@@ -38,6 +38,8 @@ export default function CVDocumentPage({ editingDependencies }: Props) {
     );
   }
 
+  const activeDocument = document;
+
   const setName = (key: keyof NonNullable<PersonalDetails["name"]>, value: string) =>
     setDetails(current => ({ ...current, name: { ...current.name, [key]: value } }));
   const setContact = (key: "email" | "phone" | "website", value: string) =>
@@ -56,14 +58,14 @@ export default function CVDocumentPage({ editingDependencies }: Props) {
 
   function saveDetails(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const result = updateCVPersonalDetails(document, details, editingDependencies);
+    const result = updateCVPersonalDetails(activeDocument, details, editingDependencies);
     if (!result.ok) { setFieldErrors(result.fieldErrors); return; }
     setFieldErrors({});
     setActiveCV(result.document);
   }
   function saveSummary(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const result = updateCVSummary(document, summary, editingDependencies);
+    const result = updateCVSummary(activeDocument, summary, editingDependencies);
     if (!result.ok) { setSummaryError(result.message); return; }
     setSummaryError("");
     setActiveCV(result.document);
