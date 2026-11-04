@@ -1,10 +1,11 @@
 import { addEntry, addSection, removeEntry, removeSection, updateEntry } from "../../domain/cv/operations";
 import type { CVDocument, CVSection } from "../../domain/cv/types";
-import type { CVSectionContentMap, StandardCVSectionKind } from "../../domain/cv/sections";
+import type { CVSectionContentMap } from "../../domain/cv/sections";
 import { validateCVDocument } from "../../domain/cv/validation";
 import type { CVCreationDependencies } from "./createCV";
 
-export type StandardSectionContent = CVSectionContentMap[StandardCVSectionKind];
+export type AdditionalStandardSectionKind = "projects" | "languages" | "certifications" | "awards" | "volunteering" | "publications" | "interests" | "references";
+export type StandardSectionContent = CVSectionContentMap[AdditionalStandardSectionKind];
 export type StandardSectionResult =
   | { ok: true; document: CVDocument }
   | { ok: false; fieldErrors: Readonly<Record<string, string>> };
@@ -18,7 +19,7 @@ function normalizeValue(value: unknown): unknown {
   return value;
 }
 
-function normalizeContent<K extends StandardCVSectionKind>(kind: K, content: CVSectionContentMap[K]): CVSectionContentMap[K] {
+function normalizeContent<K extends AdditionalStandardSectionKind>(kind: K, content: CVSectionContentMap[K]): CVSectionContentMap[K] {
   const normalized = normalizeValue(content) as Record<string, unknown>;
   for (const [key, value] of Object.entries(normalized)) {
     if (value === "") delete normalized[key];
@@ -27,7 +28,7 @@ function normalizeContent<K extends StandardCVSectionKind>(kind: K, content: CVS
   return normalized as CVSectionContentMap[K];
 }
 
-function sectionFor(document: CVDocument, kind: StandardCVSectionKind): CVSection | undefined {
+function sectionFor(document: CVDocument, kind: AdditionalStandardSectionKind): CVSection | undefined {
   return document.content.sections.find(section => section.kind === kind);
 }
 
@@ -43,7 +44,7 @@ function validationErrors(document: CVDocument, entryId: string): Record<string,
 }
 
 /** Adds or updates one entry in any of the eight remaining built-in section types. */
-export function saveStandardCVEntry<K extends StandardCVSectionKind>(
+export function saveStandardCVEntry<K extends AdditionalStandardSectionKind>(
   document: CVDocument,
   kind: K,
   entryId: string | undefined,
@@ -60,7 +61,7 @@ export function saveStandardCVEntry<K extends StandardCVSectionKind>(
   } else if (section) {
     result = addEntry(document, section.id, { id: targetEntryId, content: normalized }, dependencies.now());
   } else {
-    const titles: Record<StandardCVSectionKind, string> = {
+    const titles: Record<AdditionalStandardSectionKind, string> = {
       projects: "Projects", languages: "Languages", certifications: "Certifications", awards: "Awards",
       volunteering: "Volunteering", publications: "Publications", interests: "Interests", references: "References",
     };
@@ -78,7 +79,7 @@ export function saveStandardCVEntry<K extends StandardCVSectionKind>(
 /** Removes an entry and removes its section when the final entry is deleted. */
 export function removeStandardCVEntry(
   document: CVDocument,
-  kind: StandardCVSectionKind,
+  kind: AdditionalStandardSectionKind,
   entryId: string,
   dependencies: Pick<CVCreationDependencies, "now">,
 ): StandardSectionResult {
@@ -91,7 +92,7 @@ export function removeStandardCVEntry(
   return result.ok ? { ok: true, document: result.value } : { ok: false, fieldErrors: { form: result.error.message } };
 }
 
-export function getStandardCVEntries<K extends StandardCVSectionKind>(
+export function getStandardCVEntries<K extends AdditionalStandardSectionKind>(
   document: CVDocument,
   kind: K,
 ): Array<{ id: string; content: CVSectionContentMap[K] }> {
