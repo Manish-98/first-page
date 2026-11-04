@@ -1,6 +1,6 @@
 # Core CV domain model
 
-This module defines the foundational, platform-independent CV document contracts introduced by issue #27, the concrete section payloads introduced by issue #28, independent design composition introduced by issue #29, immutable document operations introduced by issue #30, and pure document validation introduced by issue #31.
+This module defines the foundational, platform-independent CV document contracts introduced by issue #27, the concrete section payloads introduced by issue #28, independent design composition introduced by issue #29, immutable document operations introduced by issue #30, pure document validation introduced by issue #31, and the versioned portable project format introduced by issue #33.
 
 ## Model structure
 
