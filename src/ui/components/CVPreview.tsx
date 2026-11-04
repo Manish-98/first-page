@@ -87,7 +87,7 @@ export default function CVPreview({ document }: CVPreviewProps) {
             {(email || phone || (website && isHttpUrl(website)) || addressLines.length || profiles.length) && (
               <section className="cv-preview__contact" aria-label="Contact information">
                 {email && <a href={`mailto:${email}`}>{email}</a>}
-                {phone && <a href={`tel:${phone.replace(/[^+\\d]/g, "")}`}>{phone}</a>}
+                {phone && <a href={`tel:${phone.replace(/[^+\d]/g, "")}`}>{phone}</a>}
                 {website && isHttpUrl(website) && (
                   <a href={website} target="_blank" rel="noopener noreferrer">{website}</a>
                 )}
