@@ -19,7 +19,7 @@ function normalizeValue(value: unknown): unknown {
   return value;
 }
 
-function normalizeContent<K extends AdditionalStandardSectionKind>(kind: K, content: CVSectionContentMap[K]): CVSectionContentMap[K] {
+function normalizeContent<K extends AdditionalStandardSectionKind>(content: CVSectionContentMap[K]): CVSectionContentMap[K] {
   const normalized = normalizeValue(content) as Record<string, unknown>;
   for (const [key, value] of Object.entries(normalized)) {
     if (value === "") delete normalized[key];
@@ -51,7 +51,7 @@ export function saveStandardCVEntry<K extends AdditionalStandardSectionKind>(
   content: CVSectionContentMap[K],
   dependencies: Pick<CVCreationDependencies, "generateId" | "now">,
 ): StandardSectionResult {
-  const normalized = normalizeContent(kind, content);
+  const normalized = normalizeContent(content);
   const section = sectionFor(document, kind);
   const targetEntryId = entryId ?? dependencies.generateId();
   let result;

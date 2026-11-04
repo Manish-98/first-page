@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import type { CVDocument } from "../../domain/cv/types";
-import type { CVPartialDate, StandardCVSectionKind } from "../../domain/cv/sections";
+import type { CVPartialDate } from "../../domain/cv/sections";
+import type { AdditionalStandardSectionKind } from "../../application/cv/updateCVStandardSections";
 import type { CVSectionContentMap } from "../../domain/cv/sections";
 import type { CVCreationDependencies } from "../../application/cv/createCV";
 import { getStandardCVEntries, removeStandardCVEntry, saveStandardCVEntry } from "../../application/cv/updateCVStandardSections";
@@ -8,7 +9,7 @@ import { getStandardCVEntries, removeStandardCVEntry, saveStandardCVEntry } from
 interface Props { document: CVDocument; editingDependencies: CVCreationDependencies; onDocumentChange: (document: CVDocument) => void }
 type Draft = Record<string, string | boolean>;
 interface FieldDefinition { key: string; label: string; type?: "text" | "textarea" | "url" | "email" | "select" | "list" | "date" | "date-range"; required?: boolean; options?: readonly string[] }
-interface SectionDefinition { kind: StandardCVSectionKind; title: string; fields: readonly FieldDefinition[] }
+interface SectionDefinition { kind: AdditionalStandardSectionKind; title: string; fields: readonly FieldDefinition[] }
 
 const definitions: readonly SectionDefinition[] = [
   { kind: "projects", title: "Projects", fields: [
@@ -50,10 +51,13 @@ const definitions: readonly SectionDefinition[] = [
 ];
 
 function blankDraft(definition: SectionDefinition): Draft {
-  return Object.fromEntries(definition.fields.map(field => [
-    field.key === "dateRange" ? "startDate" : field.key,
-    field.type === "date-range" ? "" : "",
-  ]).concat(definition.fields.some(field => field.type === "date-range") ? [["endDate", ""], ["ongoing", false]] : []));
+  const draft: Draft = {};
+  for (const field of definition.fields) draft[field.key === "dateRange" ? "startDate" : field.key] = "";
+  if (definition.fields.some(field => field.type === "date-range")) {
+    draft.endDate = "";
+    draft.ongoing = false;
+  }
+  return draft;
 }
 function formatDate(date: CVPartialDate | undefined): string {
   if (!date) return "";
@@ -114,7 +118,7 @@ function summaryFor(content: Record<string, unknown>): string {
 }
 
 export default function AdditionalStandardSectionsEditor({ document, editingDependencies, onDocumentChange }: Props) {
-  const [activeKind, setActiveKind] = useState<StandardCVSectionKind | undefined>();
+  const [activeKind, setActiveKind] = useState<AdditionalStandardSectionKind | undefined>();
   const [editingId, setEditingId] = useState<string | undefined>();
   const [draft, setDraft] = useState<Draft>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string,string>>({});
@@ -134,7 +138,7 @@ export default function AdditionalStandardSectionsEditor({ document, editingDepe
     if (!result.ok) { setFieldErrors(result.fieldErrors); setFormError(result.fieldErrors.form ?? "Check the highlighted fields."); return; }
     onDocumentChange(result.document); reset();
   }
-  function remove(kind: StandardCVSectionKind, id: string) {
+  function remove(kind: AdditionalStandardSectionKind, id: string) {
     const result = removeStandardCVEntry(document, kind, id, editingDependencies);
     if (!result.ok) { setFormError(result.fieldErrors.form ?? "The entry could not be removed."); return; }
     onDocumentChange(result.document);
