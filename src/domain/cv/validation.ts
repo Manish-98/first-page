@@ -142,7 +142,6 @@ export function validateCVDocument(input: unknown): CVValidationResult {
   const sectionIds = new Set<string>();
   const entryIds = new Set<string>();
   const customFieldIds = new Set<string>();
-  let documentId: string | undefined;
 
   const add = (
     code: CVValidationIssueCode,
@@ -174,7 +173,7 @@ export function validateCVDocument(input: unknown): CVValidationResult {
     return { valid: false, issues };
   }
 
-  documentId = isNonEmptyString(input.id) ? input.id : undefined;
+  const documentId = isNonEmptyString(input.id) ? input.id : undefined;
   checkId(input.id, "$.id", new Set<string>(), "duplicate-identifier");
   if (!isRecord(input.metadata)) {
     add("invalid-type", "structure", "$.metadata", "Metadata must be an object.", { documentId });
