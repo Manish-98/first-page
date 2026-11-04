@@ -11,7 +11,7 @@
   box-sizing:border-box; width:calc(var(--cv-page-count) * var(--cv-page-width) + (var(--cv-page-count) - 1) * var(--cv-column-gap));
   min-height:var(--cv-page-height); height:var(--cv-page-height); padding:var(--cv-page-margin);
   border:0; border-radius:0; background:#fffefa; box-shadow:0 8px 28px rgb(36 37 31 / 12%);
-  column-count:var(--cv-page-count); column-width:var(--cv-content-width); column-gap:var(--cv-column-gap);
+  column-count:var(--cv-page-count); column-width:var(--cv-content-width); column-gap:var(--cv-column-gap); column-rule:1px solid #e2dfd7;
   column-fill:auto; overflow:visible; font-size:10pt; line-height:1.4;
 }
 .cv-document-canvas__page-flow .cv-preview__section { break-inside:auto; }
