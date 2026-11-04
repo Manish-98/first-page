@@ -20,7 +20,8 @@ function replaceFields<T extends CVSection>(doc: CVDocument<T>, sid: CVSectionId
 }
 export function addCustomField<T extends CVSection>(doc: CVDocument<T>, sid: CVSectionId, eid: CVEntryId, field: CustomField, at: ISODateTimeString): CVOperationResult<CVDocument<T>> {
   const found = locate(doc, sid, eid);
-  if (!("entry" in found)) return { ok: false, error: found.error };
+  if ("error" in found && found.error) return { ok: false, error: found.error };
+  if (!found.entry) return { ok: false, error: { code: "entry-not-found", message: "Entry was not found.", documentId: doc.id, sectionId: sid, entryId: eid } };
   if (doc.content.sections.some(section => section.kind === "custom" && section.entries.some(entry => (entry.content as { fields: readonly CustomField[] }).fields.some(item => item.id === field.id)))) {
     return { ok: false, error: { code: "duplicate-entry-id", message: `Custom field identifier '${field.id}' already exists.`, documentId: doc.id, sectionId: sid, entryId: eid, fieldId: field.id } };
   }
@@ -31,14 +32,16 @@ export function updateCustomField<T extends CVSection>(
   updates: Partial<Omit<CustomField, "id">>, at: ISODateTimeString,
 ): CVOperationResult<CVDocument<T>> {
   const found = locate(doc, sid, eid);
-  if (!("entry" in found)) return { ok: false, error: found.error };
+  if ("error" in found && found.error) return { ok: false, error: found.error };
+  if (!found.entry) return { ok: false, error: { code: "entry-not-found", message: "Entry was not found.", documentId: doc.id, sectionId: sid, entryId: eid } };
   if (!found.entry.content.fields.some(field => field.id === fid)) return { ok: false, error: { code: "custom-field-not-found", message: `Custom field '${fid}' was not found.`, documentId: doc.id, sectionId: sid, entryId: eid, fieldId: fid } };
   const fields = found.entry.content.fields.map(field => field.id === fid ? { ...field, ...updates, id: field.id } : field);
   return { ok: true, value: replaceFields(doc, sid, eid, fields, at) };
 }
 export function removeCustomField<T extends CVSection>(doc: CVDocument<T>, sid: CVSectionId, eid: CVEntryId, fid: string, at: ISODateTimeString): CVOperationResult<CVDocument<T>> {
   const found = locate(doc, sid, eid);
-  if (!("entry" in found)) return { ok: false, error: found.error };
+  if ("error" in found && found.error) return { ok: false, error: found.error };
+  if (!found.entry) return { ok: false, error: { code: "entry-not-found", message: "Entry was not found.", documentId: doc.id, sectionId: sid, entryId: eid } };
   if (!found.entry.content.fields.some(field => field.id === fid)) return { ok: false, error: { code: "custom-field-not-found", message: `Custom field '${fid}' was not found.`, documentId: doc.id, sectionId: sid, entryId: eid, fieldId: fid } };
   return { ok: true, value: replaceFields(doc, sid, eid, found.entry.content.fields.filter(field => field.id !== fid), at) };
 }
