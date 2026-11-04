@@ -343,7 +343,8 @@ function validateBuiltInEntry(
     else if (!isValidPartialDate(content[field])) add("invalid-date", "format", fieldPath, "Date must contain a valid year and optional month/day.", context);
   }
   if (kind === "certifications" && isValidPartialDate(content.issuedOn) && isValidPartialDate(content.expiresOn)) {
-    if (comparePartialDates(content.expiresOn, content.issuedOn) < 0) add("invalid-date-range", "invariant", `${path}.content.expiresOn`, "Expiry date cannot precede issue date.", context);
+    const comparison = comparePartialDates(content.expiresOn, content.issuedOn);
+    if (comparison !== undefined && comparison < 0) add("invalid-date-range", "invariant", `${path}.content.expiresOn`, "Expiry date cannot precede issue date.", context);
   }
   if (kind === "projects" && "url" in content && typeof content.url === "string" && !isValidUrl(content.url)) {
     add("invalid-url", "format", `${path}.content.url`, "Project URL must be an absolute HTTP or HTTPS URL.", context);
