@@ -91,7 +91,7 @@ describe("CVDocumentPage", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Save personal details" }));
     expect(screen.getByRole("heading", { name: "Draft Ada" })).toBeInTheDocument();
-    expect(screen.queryByText("Draft summary")).not.toBeInTheDocument();
+    expect(screen.getByRole("article", { name: "CV preview" })).not.toHaveTextContent("Draft summary");
 
     fireEvent.change(screen.getByLabelText("Summary"), { target: { value: "Committed summary" } });
     expect(screen.queryByText("Committed summary")).not.toBeInTheDocument();
