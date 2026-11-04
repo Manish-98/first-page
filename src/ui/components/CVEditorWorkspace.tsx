@@ -140,7 +140,7 @@ export default function CVEditorWorkspace({ title, leftPanel, rightPanel, childr
           ref={isMobile && activeDrawer === "right" ? drawerRef : undefined}
           onKeyDown={isMobile && activeDrawer === "right" ? handleDrawerKeyDown : undefined}>
           <div className="editor-panel__heading">
-            <h2 id="editor-properties-title">Properties</h2>
+            <h2 id="editor-properties-title">Contextual properties</h2>
             {isMobile && activeDrawer === "right" && <button ref={drawerCloseRef}
               className="editor-panel__close" type="button" onClick={() => setActiveDrawer(null)}>Close</button>}
           </div>
