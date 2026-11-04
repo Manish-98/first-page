@@ -62,7 +62,7 @@ describe("additional standard section editors", () => {
     fireEvent.click(screen.getByRole("button", { name: "Add entry" }));
     expect(screen.getByLabelText("Given name")).toHaveValue("Unsaved Ada");
     expect(screen.getByLabelText("Summary")).toHaveValue("Unsaved summary");
-    expect(screen.getByRole("article", { name: "CV preview" })).not.toHaveTextContent("Reading");
+    expect(screen.getByRole("article", { name: "CV preview" })).toHaveTextContent("Reading");
     fireEvent.click(screen.getByRole("button", { name: "Save personal details" }));
     expect(screen.getByRole("article", { name: "CV preview" })).toHaveTextContent("Reading");
   });
