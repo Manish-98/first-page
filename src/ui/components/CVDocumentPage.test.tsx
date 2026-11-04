@@ -96,7 +96,7 @@ describe("CVDocumentPage", () => {
     fireEvent.change(screen.getByLabelText("Summary"), { target: { value: "Committed summary" } });
     expect(screen.getByRole("article", { name: "CV preview" })).not.toHaveTextContent("Committed summary");
     fireEvent.click(screen.getByRole("button", { name: "Save summary" }));
-    expect(screen.getByText("Committed summary")).toBeInTheDocument();
+    expect(screen.getByRole("article", { name: "CV preview" })).toHaveTextContent("Committed summary");
   });
 
   it("removes cleared details from the preview after saving", () => {
