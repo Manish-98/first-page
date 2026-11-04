@@ -29,8 +29,8 @@ export default function CVDocumentPage({ editingDependencies }: Props) {
   const lastSavedForm = useRef<"details" | "summary" | "section" | null>(null);
 
   useEffect(() => {
-    document.body.classList.add("cv-editor-active");
-    return () => document.body.classList.remove("cv-editor-active");
+    window.document.body.classList.add("cv-editor-active");
+    return () => window.document.body.classList.remove("cv-editor-active");
   }, []);
 
   useEffect(() => {
