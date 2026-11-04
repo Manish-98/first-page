@@ -25,7 +25,7 @@ function normalizeContent<K extends AdditionalStandardSectionKind>(content: CVSe
     if (value === "") delete normalized[key];
     if (Array.isArray(value) && value.length === 0) delete normalized[key];
   }
-  return normalized as CVSectionContentMap[K];
+  return normalized as unknown as CVSectionContentMap[K];
 }
 
 function sectionFor(document: CVDocument, kind: AdditionalStandardSectionKind): CVSection | undefined {
