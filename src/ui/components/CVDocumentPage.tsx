@@ -14,6 +14,8 @@ import SkillsEditor from "./SkillsEditor";
 import AdditionalStandardSectionsEditor from "./AdditionalStandardSectionsEditor";
 import CVSectionManager from "./CVSectionManager";
 import CustomSectionsEditor from "./CustomSectionsEditor";
+import CVEditorHeader from "./CVEditorHeader";
+import CVEditorWorkspace from "./CVEditorWorkspace";
 
 interface Props { editingDependencies: CVCreationDependencies }
 const emptyDetails: PersonalDetails = {};
@@ -27,6 +29,11 @@ export default function CVDocumentPage({ editingDependencies }: Props) {
   const lastSavedForm = useRef<"details" | "summary" | "section" | null>(null);
 
   useEffect(() => {
+    window.document.body.classList.add("cv-editor-active");
+    return () => window.document.body.classList.remove("cv-editor-active");
+  }, []);
+
+  useEffect(() => {
     if (!document) return;
     if (lastSavedForm.current !== "summary" && lastSavedForm.current !== "section") setDetails(document.content.personalDetails);
     const entry = document.content.sections.find(section => section.kind === "summary")?.entries[0];
@@ -38,12 +45,15 @@ export default function CVDocumentPage({ editingDependencies }: Props) {
 
   if (!document) {
     return (
-      <ContentSection className="creation-page" labelledBy="missing-cv-title">
+      <div className="cv-editor-route">
+        <CVEditorHeader />
+        <ContentSection className="creation-page" labelledBy="missing-cv-title">
         <p className="eyebrow">NO ACTIVE DOCUMENT</p>
         <h1 id="missing-cv-title">Your CV isn’t <em>open.</em></h1>
         <p className="intro">This document is held only in the current app session. Start a new CV to continue.</p>
         <AppLink href="#/new-cv" variant="action">Create a CV</AppLink>
-      </ContentSection>
+        </ContentSection>
+      </div>
     );
   }
 
@@ -103,13 +113,12 @@ export default function CVDocumentPage({ editingDependencies }: Props) {
   );
 
   return (
-    <ContentSection className="creation-page cv-editor" labelledBy="document-title">
-      <p className="eyebrow">YOUR CV · EDIT CONTENT</p>
-      <h1 id="document-title">{document.metadata.title}</h1>
-      <p className="intro">Add the details you want employers to see. You can leave optional fields blank.</p>
-
-      <div className="cv-editor__layout">
-        <div className="cv-editor__forms">
+    <div className="cv-editor-route">
+      <CVEditorHeader />
+      <CVEditorWorkspace
+        title={document.metadata.title}
+        leftPanel={(
+          <div className="cv-editor__forms">
           <section className="cv-editor__section" aria-labelledby="personal-details-title">
             <h2 id="personal-details-title">Personal details</h2>
             <form onSubmit={saveDetails} noValidate>
@@ -164,12 +173,25 @@ export default function CVDocumentPage({ editingDependencies }: Props) {
           <EducationEditor document={activeDocument} editingDependencies={editingDependencies} onDocumentChange={saveSectionDocument} />
           <SkillsEditor document={activeDocument} editingDependencies={editingDependencies} onDocumentChange={saveSectionDocument} />
           <AdditionalStandardSectionsEditor document={activeDocument} editingDependencies={editingDependencies} onDocumentChange={saveSectionDocument} />
+            <p className="field-hint">This CV is held in memory for this app session only. It is not saved when you refresh or close the page.</p>
+          </div>
+        )}
+        rightPanel={(
+          <div className="editor-properties-empty">
+            <span className="editor-properties-empty__mark" aria-hidden="true">✦</span>
+            <h3>Nothing selected</h3>
+            <p>Selecting and editing individual elements on the document canvas will be available in a later editor story.</p>
+          </div>
+        )}
+      >
+        <div className="cv-editor-canvas">
+          <div className="cv-preview-panel__topline">
+            <h2>Document</h2>
+            <span>Read-only canvas</span>
+          </div>
+          <CVPreview document={activeDocument} />
         </div>
-        <CVPreview document={activeDocument} />
-      </div>
-
-      <p className="field-hint">This CV is currently held in memory for this app session only. It is not saved when you refresh or close the page.</p>
-      <AppLink href="#/" className="back-link">Back to home</AppLink>
-    </ContentSection>
+      </CVEditorWorkspace>
+    </div>
   );
 }
