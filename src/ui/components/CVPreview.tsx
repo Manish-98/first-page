@@ -1,5 +1,5 @@
 import type { CVDocument } from "../../domain/cv/types";
-import type { CVPartialDate, ExperienceSectionContent } from "../../domain/cv/sections";
+import type { CVPartialDate, EducationSectionContent, ExperienceSectionContent, SkillSectionContent } from "../../domain/cv/sections";
 
 interface CVPreviewProps {
   document: CVDocument;
@@ -60,6 +60,26 @@ function getExperienceEntries(document: CVDocument): ExperienceSectionContent[] 
   });
 }
 
+function getEducationEntries(document: CVDocument): EducationSectionContent[] {
+  const section = document.content.sections.find(item => item.kind === "education");
+  if (!section) return [];
+  return section.entries.flatMap(entry => {
+    const content = entry.content;
+    return content && typeof content === "object" && "institution" in content && "qualification" in content
+      ? [content as EducationSectionContent] : [];
+  });
+}
+
+function getSkillEntries(document: CVDocument): SkillSectionContent[] {
+  const section = document.content.sections.find(item => item.kind === "skills");
+  if (!section) return [];
+  return section.entries.flatMap(entry => {
+    const content = entry.content;
+    return content && typeof content === "object" && "name" in content
+      ? [content as SkillSectionContent] : [];
+  });
+}
+
 function getSummaryEntries(document: CVDocument): string[] {
   const section = document.content.sections.find(item => item.kind === "summary");
   if (!section) return [];
@@ -83,9 +103,12 @@ export default function CVPreview({ document }: CVPreviewProps) {
   );
   const summaryEntries = getSummaryEntries(document);
   const experienceEntries = getExperienceEntries(document);
+  const educationEntries = getEducationEntries(document);
+  const skillEntries = getSkillEntries(document);
   const hasContent = Boolean(
     name || headline || email || phone || (website && isHttpUrl(website)) ||
-    addressLines.length || profiles.length || summaryEntries.length || experienceEntries.length,
+    addressLines.length || profiles.length || summaryEntries.length || experienceEntries.length ||
+    educationEntries.length || skillEntries.length,
   );
 
   return (
@@ -152,6 +175,40 @@ export default function CVPreview({ document }: CVPreviewProps) {
                     </section>
                   );
                 })}
+              </section>
+            )}
+            {educationEntries.length > 0 && (
+              <section className="cv-preview__section" aria-labelledby="cv-preview-education-title">
+                <h4 id="cv-preview-education-title">Education</h4>
+                {educationEntries.map((education, index) => {
+                  const start = formatPartialDate(education.dateRange?.startDate);
+                  const end = education.dateRange?.ongoing ? "Present" : formatPartialDate(education.dateRange?.endDate);
+                  const period = [start, end].filter(Boolean).join(" – ");
+                  return (
+                    <section className="cv-preview__education" key={index}>
+                      <h5>{education.qualification}{education.fieldOfStudy ? " · " + education.fieldOfStudy : ""}</h5>
+                      <p className="cv-preview__experience-meta">{education.institution}{education.location ? " · " + education.location : ""}</p>
+                      {period && <p className="cv-preview__experience-period">{period}</p>}
+                      {education.grade && <p className="cv-preview__experience-period">Grade: {education.grade}</p>}
+                      {education.description && <p className="cv-preview__summary">{education.description}</p>}
+                    </section>
+                  );
+                })}
+              </section>
+            )}
+            {skillEntries.length > 0 && (
+              <section className="cv-preview__section" aria-labelledby="cv-preview-skills-title">
+                <h4 id="cv-preview-skills-title">Skills</h4>
+                <ul className="cv-preview__skills">
+                  {skillEntries.map((skill, index) => (
+                    <li key={index}>
+                      <strong>{skill.name}</strong>
+                      {skill.category && <span>{skill.category}</span>}
+                      {skill.level && <span>{skill.level[0].toUpperCase() + skill.level.slice(1)}</span>}
+                      {skill.keywords?.length ? <span>{skill.keywords.join(" · ")}</span> : null}
+                    </li>
+                  ))}
+                </ul>
               </section>
             )}
           </>
