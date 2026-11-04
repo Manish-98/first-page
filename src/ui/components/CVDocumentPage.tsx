@@ -86,7 +86,7 @@ export default function CVDocumentPage({ editingDependencies }: Props) {
 
       <section className="cv-editor__section" aria-labelledby="personal-details-title">
         <h2 id="personal-details-title">Personal details</h2>
-        <form onSubmit={saveDetails}>
+        <form onSubmit={saveDetails} noValidate>
           <div className="cv-editor__grid">
             {field("Given name", details.name?.givenName, value => setName("givenName", value), "name.givenName")}
             {field("Additional name", details.name?.additionalName, value => setName("additionalName", value), "name.additionalName")}
