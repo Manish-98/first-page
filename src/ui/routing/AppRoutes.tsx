@@ -7,7 +7,6 @@ import CVDocumentPage from "../components/CVDocumentPage";
 
 const routeTable = {
   "/": WelcomePanel,
-  "/cv": CVDocumentPage,
 } as const;
 
 interface AppRoutesProps {
@@ -35,6 +34,8 @@ export default function AppRoutes({ cvCreationDependencies }: AppRoutesProps) {
   if (path === "/new-cv") {
     return <NewCVPage creationDependencies={cvCreationDependencies} />;
   }
+
+  if (path === "/cv") return <CVDocumentPage editingDependencies={cvCreationDependencies} />;
 
   const Route = routeTable[path as keyof typeof routeTable];
   return Route ? <Route /> : <NotFoundPage />;

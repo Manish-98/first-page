@@ -461,3 +461,55 @@ h1 em { color: var(--color-accent); font-weight: 400; }
 @media (prefers-reduced-motion: reduce) {
   .creation-option { transition: none; }
 }
+
+
+.cv-editor { max-width: 900px; }
+.cv-editor__section {
+  margin: 32px 0;
+  border: 1px solid var(--color-control-border);
+  border-radius: 16px;
+  padding: clamp(20px, 4vw, 32px);
+  background: #fffefa;
+}
+.cv-editor__section h2 {
+  margin: 0 0 24px;
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  font-weight: 400;
+}
+.cv-editor__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.cv-field { display: flex; min-width: 0; flex-direction: column; gap: 7px; }
+.cv-field > span:first-child { color: var(--color-muted); font-size: .84rem; font-weight: 650; }
+.cv-field input, .cv-field textarea {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--color-control-border);
+  border-radius: 8px;
+  padding: 11px 12px;
+  background: white;
+  color: var(--color-ink);
+  font: inherit;
+}
+.cv-field textarea { resize: vertical; line-height: 1.6; }
+.cv-field input[aria-invalid="true"] { border-color: #9b3f35; }
+.cv-field__error { margin: 0; color: #9b3f35; font-size: .82rem; line-height: 1.5; }
+.cv-profiles { margin: 28px 0; border: 0; padding: 0; }
+.cv-profiles legend { margin-bottom: 14px; font-weight: 650; }
+.cv-profile-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) auto;
+  align-items: end;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.cv-editor__section form > .button { margin-top: 22px; }
+.cv-editor__section form > .cv-field { max-width: 100%; }
+.cv-editor__section textarea { max-width: 100%; }
+@media (max-width: 620px) {
+  .cv-editor__grid, .cv-profile-row { grid-template-columns: 1fr; }
+  .cv-profile-row .text-button { justify-self: start; }
+}

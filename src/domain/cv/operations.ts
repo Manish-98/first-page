@@ -59,6 +59,11 @@ export function createCVDocument<T extends CVSection = CVSection>(input: CreateC
 function withUpdatedAt<T extends CVSection>(doc: CVDocument<T>, updatedAt: ISODateTimeString, content = doc.content, metadata: Partial<CVDocumentMetadata> = {}): CVDocument<T> { return { ...doc, metadata: { ...doc.metadata, ...metadata, updatedAt }, content }; }
 export function updateDocumentMetadata<T extends CVSection>(doc: CVDocument<T>, updates: { title?: string }, at: ISODateTimeString): CVOperationResult<CVDocument<T>> { return success(withUpdatedAt(doc, at, doc.content, updates)); }
 export function updatePersonalDetails<T extends CVSection>(doc: CVDocument<T>, updates: Partial<PersonalDetails>, at: ISODateTimeString): CVOperationResult<CVDocument<T>> { return success(withUpdatedAt(doc, at, { ...doc.content, personalDetails: { ...doc.content.personalDetails, ...updates } })); }
+
+/** Replaces personal details atomically; omitted optional properties are truly cleared. */
+export function replacePersonalDetails<T extends CVSection>(doc: CVDocument<T>, personalDetails: PersonalDetails, at: ISODateTimeString): CVOperationResult<CVDocument<T>> {
+  return success(withUpdatedAt(doc, at, { ...doc.content, personalDetails }));
+}
 export function updatePersonName<T extends CVSection>(doc: CVDocument<T>, updates: Partial<PersonName>, at: ISODateTimeString): CVOperationResult<CVDocument<T>> { return updatePersonalDetails(doc, { name: { ...doc.content.personalDetails.name, ...updates } }, at); }
 export function updateContactDetails<T extends CVSection>(doc: CVDocument<T>, updates: Partial<ContactDetails>, at: ISODateTimeString): CVOperationResult<CVDocument<T>> { return updatePersonalDetails(doc, { contact: { ...doc.content.personalDetails.contact, ...updates } }, at); }
 export function updatePostalAddress<T extends CVSection>(doc: CVDocument<T>, updates: Partial<PostalAddress>, at: ISODateTimeString): CVOperationResult<CVDocument<T>> { return updateContactDetails(doc, { address: { ...doc.content.personalDetails.contact?.address, ...updates } }, at); }
