@@ -11,9 +11,7 @@ export default function CVDocumentCanvas({ document }: { document: CVDocument })
     const measure = () => {
       const article = measureRef.current?.querySelector<HTMLElement>(".cv-preview");
       if (!article) return;
-      const styles = window.getComputedStyle(article);
-      const padding = Number.parseFloat(styles.paddingTop) + Number.parseFloat(styles.paddingBottom);
-      setPageCount(calculatePageCount(article.scrollHeight - padding));
+      setPageCount(calculatePageCount(article.scrollHeight - A4_PAGE.margin * 2));
     };
     measure();
     const article = measureRef.current?.querySelector(".cv-preview");
