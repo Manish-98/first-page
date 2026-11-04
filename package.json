@@ -2,6 +2,7 @@
   "name": "first-page",
   "private": true,
   "version": "0.1.0",
+  "description": "A local-first CV and resume builder.",
   "type": "module",
   "engines": {
     "node": ">=20.19.0"
