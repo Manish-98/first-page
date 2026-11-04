@@ -75,4 +75,4 @@ Missing optional CV information is not a validation failure. The validator check
 - Unknown extension section kinds remain structurally preserved under the existing extension policy. Extension-specific payload semantics are not inferred by the core validator.
 - The project format is an allow-listed envelope, not a dump of application state. Credentials, API keys, authentication material, caches, sessions, and transient runtime state are not portable project data.
 
-The project module does not own file pickers, browser file APIs, persistence adapters, or save/open UI; those are application/infrastructure concerns for the relevant project-file workflow.
+The project module does not own file pickers, browser file APIs, persistence adapters, or save/open UI; those are application/infrastructure concerns for the relevant project-file workflow. JSON is the interchange encoding; only JSON-representable values are accepted so serialization cannot silently coerce extension data.
