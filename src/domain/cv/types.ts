@@ -83,9 +83,9 @@ export interface CVSection<
 }
 
 /** Factual CV information, kept independent of visual presentation/layout. */
-export interface CVContent {
+export interface CVContent<TSection extends CVSection = CVSection> {
   personalDetails: PersonalDetails;
-  sections: readonly CVSection[];
+  sections: readonly TSection[];
 }
 
 /** Descriptive document metadata, separate from factual CV content. */
@@ -96,8 +96,8 @@ export interface CVDocumentMetadata {
 }
 
 /** Root in-memory CV document contract. */
-export interface CVDocument {
+export interface CVDocument<TSection extends CVSection = CVSection> {
   id: CVDocumentId;
   metadata: CVDocumentMetadata;
-  content: CVContent;
+  content: CVContent<TSection>;
 }
