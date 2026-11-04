@@ -1,6 +1,6 @@
 # Core CV domain model
 
-This module defines the foundational, platform-independent CV document contracts introduced by issue #27, the concrete section payloads introduced by issue #28, independent design composition introduced by issue #29, and immutable document operations introduced by issue #30.
+This module defines the foundational, platform-independent CV document contracts introduced by issue #27, the concrete section payloads introduced by issue #28, independent design composition introduced by issue #29, immutable document operations introduced by issue #30, and pure document validation introduced by issue #31.
 
 ## Model structure
 
@@ -49,4 +49,15 @@ This module defines the foundational, platform-independent CV document contracts
 
 This module owns factual CV contracts and deterministic immutable transformations, plus independent design composition. Editor forms, UI behavior, persistence, undo/redo, pagination, rendering, document-import/export, and the versioned serialized project schema remain outside this scope.
 
-`types.type-test.ts`, `sections.type-test.ts`, and `presentation.type-test.ts` contain compile-time contract fixtures. `presentation.test.ts` and `operations.test.ts` contain executable unit tests for pure domain operations and immutability guarantees.
+`types.type-test.ts`, `sections.type-test.ts`, and `presentation.type-test.ts` contain compile-time contract fixtures. `presentation.test.ts`, `operations.test.ts`, and `validation.test.ts` contain executable unit tests for pure domain operations, validation rules, and immutability guarantees.
+
+
+## Runtime document validation
+
+`validation.ts` exposes `validateCVDocument(input: unknown)`, a pure validator for untrusted runtime data. It returns `{ valid, issues }`; expected invalid input is represented as structured issues rather than thrown exceptions.
+
+Each issue has a stable `code`, `category` (`structure`, `format`, or `invariant`), a JSONPath-like `path`, and a concise message. When known, document, section, entry, and custom-field identifiers are included. The validator collects multiple issues in one pass and never mutates the supplied value.
+
+Validation covers document and metadata shape, identifier presence and uniqueness, personal/contact data, standard section payloads, custom-field discriminants and values, partial calendar dates, date-range consistency, supported enums, and HTTP(S) URLs. Partial dates may specify year, year/month, or year/month/day. Leap years and calendar bounds are checked. An ongoing range cannot also contain an end date; clearly reversed ranges are rejected. An absent end date without an explicit ongoing flag remains valid incomplete data.
+
+Missing optional CV information is not a validation failure. The validator checks whether supplied data is structurally and semantically well-formed; it does not score completeness or recommend content. Unknown extension section kinds are accepted when their generic section and entry structure is valid. Their extension-specific payload rules are not inferred in the absence of an extension schema.
