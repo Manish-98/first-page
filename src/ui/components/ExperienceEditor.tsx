@@ -227,6 +227,7 @@ export default function ExperienceEditor({ document, editingDependencies }: Prop
                   {dateField("Month (optional)", "start", "Month", "MM")}
                   {dateField("Day (optional)", "start", "Day", "DD")}
                 </div>
+                {fieldErrors["dateRange.startDate"] && <p className="cv-field__error" id="dateRange-startDate" role="alert">{fieldErrors["dateRange.startDate"]}</p>}
               </div>
               <div className="experience-date-group">
                 <h4>End date</h4>
@@ -235,8 +236,7 @@ export default function ExperienceEditor({ document, editingDependencies }: Prop
                   {dateField("Month (optional)", "end", "Month", "MM")}
                   {dateField("Day (optional)", "end", "Day", "DD")}
                 </div>
-                {fieldErrors["dateRange.startDate"] && key === "start" && <p className="cv-field__error" id="dateRange-startDate" role="alert">{fieldErrors["dateRange.startDate"]}</p>}
-                {fieldErrors["dateRange.endDate"] && key === "end" && <p className="cv-field__error" id="dateRange-endDate" role="alert">{fieldErrors["dateRange.endDate"]}</p>}
+                {fieldErrors["dateRange.endDate"] && <p className="cv-field__error" id="dateRange-endDate" role="alert">{fieldErrors["dateRange.endDate"]}</p>}
               </div>
             </div>
             <label className="experience-ongoing"><input type="checkbox" checked={draft.ongoing} onChange={event => updateDraft("ongoing", event.target.checked)} /> I currently work here</label>
