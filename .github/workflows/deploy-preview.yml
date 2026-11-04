@@ -33,10 +33,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
 
       - name: Install dependencies
         if: github.event.action != 'closed'
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
 
       - name: Build preview
         if: github.event.action != 'closed'
@@ -116,7 +117,7 @@ jobs:
           fi
           {
             printf '%s' "${base_body}"
-            printf '%s\n' "${MARKER}" "## Preview" "" "[Open the latest preview deployment ↗](${PREVIEW_URL})" "" "Preview updates automatically when new commits are pushed to this PR."
+            printf '%s\\n' "${MARKER}" "## Preview" "" "[Open the latest preview deployment ↗](${PREVIEW_URL})" "" "Preview updates automatically when new commits are pushed to this PR."
           } > pr-body.md
           gh api --method PATCH "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}" -F body=@pr-body.md
 
