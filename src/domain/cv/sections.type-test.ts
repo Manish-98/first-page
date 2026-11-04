@@ -10,6 +10,9 @@ const yearOnly: CVPartialDate = { year: 2024 };
 const monthAndYear: CVPartialDate = { year: 2025, month: 3 };
 const fullDate: CVPartialDate = { year: 2026, month: 6, day: 15 };
 
+// @ts-expect-error A day cannot be specified without its month.
+export const invalidDayOnlyDate: CVPartialDate = { year: 2024, day: 12 };
+
 const completedRange: CVDateRange = {
   startDate: monthAndYear,
   endDate: fullDate,
