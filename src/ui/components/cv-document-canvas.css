@@ -2,17 +2,17 @@
 .cv-document-canvas__heading { display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin:0 0 14px; }
 .cv-document-canvas__heading h2 { margin:0; font-family:var(--font-display); font-size:1.55rem; font-weight:400; }
 .cv-document-canvas__heading span { color:var(--color-subtle); font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; }
-.cv-document-canvas__viewport { overflow-x:auto; overflow-y:hidden; padding:4px 4px 24px; }
-.cv-document-canvas__page-flow { width:max-content; min-width:var(--cv-page-width); margin:0 auto; }
-.cv-document-canvas__page-flow .cv-preview-panel { width:var(--cv-canvas-content-width); position:static; }
+.cv-document-canvas__viewport { overflow-x:hidden; overflow-y:visible; padding:4px 4px 24px; }
+.cv-document-canvas__page-flow { width:var(--cv-page-width); max-width:100%; margin:0 auto; }
+.cv-document-canvas__page-flow .cv-preview-panel { width:var(--cv-page-width); max-width:100%; position:static; }
 .cv-document-canvas__page-flow .cv-preview-panel__topline,
 .cv-document-canvas__measure .cv-preview-panel__topline { display:none; }
 .cv-document-canvas__page-flow .cv-preview {
-  box-sizing:border-box; width:calc(var(--cv-page-count) * var(--cv-page-width) + (var(--cv-page-count) - 1) * var(--cv-column-gap));
-  min-height:var(--cv-page-height); height:var(--cv-page-height); padding:var(--cv-page-margin);
+  box-sizing:border-box; width:var(--cv-page-width); max-width:100%;
+  min-height:var(--cv-page-height); height:auto; padding:var(--cv-page-margin);
   border:0; border-radius:0; background:#fffefa; box-shadow:0 8px 28px rgb(36 37 31 / 12%);
-  column-count:var(--cv-page-count); column-width:var(--cv-content-width); column-gap:var(--cv-column-gap); column-rule:1px solid #e2dfd7;
-  column-fill:auto; overflow:visible; font-size:10pt; line-height:1.4;
+  columns:1; column-gap:0; column-rule:0; column-fill:auto;
+  overflow:visible; font-size:10pt; line-height:1.4;
 }
 .cv-document-canvas__page-flow .cv-preview__section { break-inside:auto; }
 .cv-document-canvas__page-flow .cv-preview__section h4,
@@ -28,4 +28,4 @@
   box-sizing:border-box; width:var(--cv-page-width); min-height:0; padding:var(--cv-page-margin);
   border:0; border-radius:0; box-shadow:none; font-size:10pt; line-height:1.4;
 }
-@media (max-width:960px) { .cv-document-canvas__page-flow { margin-left:0; margin-right:0; } }
+@media (max-width:960px) { .cv-document-canvas__page-flow { margin-left:auto; margin-right:auto; } }
