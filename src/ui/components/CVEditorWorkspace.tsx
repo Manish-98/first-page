@@ -1,3 +1,4 @@
+import "./cv-editor-workspace.css";
 import { useEffect, useRef, useState, type ReactNode, type KeyboardEvent } from "react";
 
 type Drawer = "left" | "right" | null;
@@ -70,8 +71,6 @@ export default function CVEditorWorkspace({
   }, [activeDrawer, isMobile]);
 
   function openDrawer(drawer: Exclude<Drawer, null>) {
-    if (drawer === "left") leftTriggerRef.current?.focus();
-    else rightTriggerRef.current?.focus();
     setActiveDrawer(drawer);
   }
 
@@ -165,7 +164,7 @@ export default function CVEditorWorkspace({
         >
           <div className="editor-panel__heading">
             <h2 id="editor-tools-title">Tools and sections</h2>
-            {isMobile && <button ref={drawerCloseRef} className="editor-panel__close" type="button" onClick={() => setActiveDrawer(null)}>Close</button>}
+            {isMobile && activeDrawer === "left" && <button ref={drawerCloseRef} className="editor-panel__close" type="button" onClick={() => setActiveDrawer(null)}>Close</button>}
           </div>
           <div className="editor-panel__content">{leftPanel}</div>
         </aside>
@@ -188,7 +187,7 @@ export default function CVEditorWorkspace({
         >
           <div className="editor-panel__heading">
             <h2 id="editor-properties-title">Properties</h2>
-            {isMobile && <button ref={drawerCloseRef} className="editor-panel__close" type="button" onClick={() => setActiveDrawer(null)}>Close</button>}
+            {isMobile && activeDrawer === "right" && <button ref={drawerCloseRef} className="editor-panel__close" type="button" onClick={() => setActiveDrawer(null)}>Close</button>}
           </div>
           <div className="editor-panel__content">{rightPanel}</div>
         </aside>
