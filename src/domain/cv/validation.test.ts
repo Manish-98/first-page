@@ -1,7 +1,19 @@
 import { describe, expect, it } from "vitest";
 import { validateCVDocument } from "./validation";
 
-const validDocument = () => ({
+type TestField = { id: string; key: string; label: string; value: unknown };
+type TestEntry = { id: string; content: Record<string, unknown> & { fields?: TestField[] } };
+type TestSection = { id: string; kind: string; entries: TestEntry[] };
+type TestDocument = {
+  id: string;
+  metadata: Record<string, unknown>;
+  content: {
+    personalDetails: Record<string, unknown> & { contact?: Record<string, unknown> };
+    sections: TestSection[];
+  };
+};
+
+const validDocument = (): TestDocument => ({
   id: "cv-1",
   metadata: { title: "CV", createdAt: "2026-01-01", updatedAt: "2026-02-01" },
   content: {
@@ -33,7 +45,7 @@ describe("validateCVDocument", () => {
 
   it("returns all structural and format issues with stable paths", () => {
     const invalid = validDocument();
-    invalid.content.personalDetails.contact.email = "not-an-email";
+    invalid.content.personalDetails.contact!.email = "not-an-email";
     invalid.content.sections[0].entries[0].content.role = 42;
     invalid.content.sections[0].entries[0].content.dateRange = {
       startDate: { year: 2025, month: 13 },
@@ -58,10 +70,10 @@ describe("validateCVDocument", () => {
         { id: "role-1", content: { fields: [{ id: "field-1", key: "x", label: "X", value: { type: "text", value: "x" } }] } },
       ],
     });
-    invalid.content.sections[1].entries[0].content.fields.push({
+    invalid.content.sections[1].entries[0].content.fields!.push({
       id: "field-1", key: "duplicate", label: "Duplicate", value: { type: "number", value: 1 },
     });
-    invalid.content.sections[1].entries[0].content.fields.push({
+    invalid.content.sections[1].entries[0].content.fields!.push({
       id: "", key: "missing", label: "Missing", value: { type: "text", value: "x" },
     });
     const result = validateCVDocument(invalid);
@@ -79,8 +91,7 @@ describe("validateCVDocument", () => {
       startDate: { year: 2024, month: 2, day: 29 },
       endDate: { year: 2023, month: 12 },
     };
-    const result = validateCVDocument(invalid);
-    expect(result.issues).toEqual(expect.arrayContaining([
+    expect(validateCVDocument(invalid).issues).toEqual(expect.arrayContaining([
       expect.objectContaining({ code: "invalid-date-range" }),
     ]));
     const nonLeap = validDocument();
@@ -95,7 +106,7 @@ describe("validateCVDocument", () => {
     invalid.content.sections[0].entries[0].content.dateRange = {
       startDate: { year: 2020 }, endDate: { year: 2021 }, ongoing: true,
     };
-    invalid.content.sections[1].entries[0].content.fields[0].value = { type: "number", value: Number.NaN };
+    invalid.content.sections[1].entries[0].content.fields![0].value = { type: "number", value: Number.NaN };
     const result = validateCVDocument(invalid);
     expect(result.issues).toEqual(expect.arrayContaining([
       expect.objectContaining({ code: "invalid-date-range" }),
@@ -113,8 +124,7 @@ describe("validateCVDocument", () => {
     const document = validDocument();
     const before = structuredClone(document);
     const first = validateCVDocument(document);
-    const second = validateCVDocument(document);
-    expect(first).toEqual(second);
+    expect(first).toEqual(validateCVDocument(document));
     expect(document).toEqual(before);
   });
 
