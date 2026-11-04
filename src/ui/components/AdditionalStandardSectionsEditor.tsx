@@ -154,7 +154,7 @@ export default function AdditionalStandardSectionsEditor({ document, editingDepe
         {entries.length ? <ul className="experience-entry-list">{entries.map(entry => <li className="experience-entry" key={entry.id}>
           <div className="experience-entry__content"><h3>{summaryFor(entry.content as unknown as Record<string,unknown>) || item.title}</h3></div>
           <div className="experience-entry__actions">
-            <button className="text-button" type="button" onClick={() => openForm(item, entry.id, entry.content as Record<string,unknown>)}>Edit</button>
+            <button className="text-button" type="button" onClick={() => openForm(item, entry.id, entry.content as unknown as Record<string,unknown>)}>Edit</button>
             <button className="text-button" type="button" aria-label={`Remove ${item.title.toLowerCase()} entry ${entry.id}`} onClick={() => remove(item.kind, entry.id)}>Remove</button>
           </div>
         </li>)}</ul> : <p className="field-hint">Add {item.title.toLowerCase()} to include them in your CV.</p>}
