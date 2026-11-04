@@ -3,11 +3,11 @@ import type { CVDocument } from "../../domain/cv/types";
 import type { CVPartialDate, ExperienceSectionContent } from "../../domain/cv/sections";
 import type { CVCreationDependencies } from "../../application/cv/createCV";
 import { getExperienceEntries, removeCVExperience, saveCVExperience } from "../../application/cv/updateCVExperience";
-import { setActiveCV } from "../../application/cv/cvSession";
 
 interface Props {
   document: CVDocument;
   editingDependencies: CVCreationDependencies;
+  onDocumentChange: (document: CVDocument) => void;
 }
 interface ExperienceDraft {
   role: string;
@@ -84,7 +84,7 @@ function displayDate(date: CVPartialDate | undefined): string {
   return [date.day, date.month, date.year].filter(value => value !== undefined).join("/");
 }
 
-export default function ExperienceEditor({ document, editingDependencies }: Props) {
+export default function ExperienceEditor({ document, editingDependencies, onDocumentChange }: Props) {
   const [draft, setDraft] = useState<ExperienceDraft>(emptyDraft);
   const [editingId, setEditingId] = useState<string | undefined>();
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -136,7 +136,7 @@ export default function ExperienceEditor({ document, editingDependencies }: Prop
       setFieldErrors({ ...errors, ...result.fieldErrors });
       return;
     }
-    setActiveCV(result.document);
+    onDocumentChange(result.document);
     resetForm();
   }
   function removeEntry(id: string) {
@@ -145,7 +145,7 @@ export default function ExperienceEditor({ document, editingDependencies }: Prop
       setFieldErrors(result.fieldErrors);
       return;
     }
-    setActiveCV(result.document);
+    onDocumentChange(result.document);
     if (editingId === id) resetForm();
   }
   const entriesList = entries.map(entry => {
