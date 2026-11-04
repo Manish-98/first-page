@@ -11,6 +11,7 @@ import CVPreview from "./CVPreview";
 import ExperienceEditor from "./ExperienceEditor";
 import EducationEditor from "./EducationEditor";
 import SkillsEditor from "./SkillsEditor";
+import AdditionalStandardSectionsEditor from "./AdditionalStandardSectionsEditor";
 
 interface Props { editingDependencies: CVCreationDependencies }
 const emptyDetails: PersonalDetails = {};
@@ -152,6 +153,7 @@ export default function CVDocumentPage({ editingDependencies }: Props) {
           <ExperienceEditor document={activeDocument} editingDependencies={editingDependencies} onDocumentChange={saveSectionDocument} />
           <EducationEditor document={activeDocument} editingDependencies={editingDependencies} onDocumentChange={saveSectionDocument} />
           <SkillsEditor document={activeDocument} editingDependencies={editingDependencies} onDocumentChange={saveSectionDocument} />
+          <AdditionalStandardSectionsEditor document={activeDocument} editingDependencies={editingDependencies} onDocumentChange={saveSectionDocument} />
         </div>
         <CVPreview document={activeDocument} />
       </div>

@@ -1,5 +1,6 @@
 import type { CVDocument } from "../../domain/cv/types";
 import type { CVPartialDate, EducationSectionContent, ExperienceSectionContent, SkillSectionContent } from "../../domain/cv/sections";
+import AdditionalSectionsPreview from "./AdditionalSectionsPreview";
 
 interface CVPreviewProps {
   document: CVDocument;
@@ -108,7 +109,7 @@ export default function CVPreview({ document }: CVPreviewProps) {
   const hasContent = Boolean(
     name || headline || email || phone || (website && isHttpUrl(website)) ||
     addressLines.length || profiles.length || summaryEntries.length || experienceEntries.length ||
-    educationEntries.length || skillEntries.length,
+    educationEntries.length || skillEntries.length || document.content.sections.some(section => ["projects","languages","certifications","awards","volunteering","publications","interests","references"].includes(section.kind) && section.entries.length > 0),
   );
 
   return (
@@ -196,6 +197,7 @@ export default function CVPreview({ document }: CVPreviewProps) {
                 })}
               </section>
             )}
+            <AdditionalSectionsPreview document={document} />
             {skillEntries.length > 0 && (
               <section className="cv-preview__section" aria-labelledby="cv-preview-skills-title">
                 <h4 id="cv-preview-skills-title">Skills</h4>
