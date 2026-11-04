@@ -211,6 +211,35 @@ describe("validateCVProject", () => {
     );
   });
 
+
+  it("rejects extension values that JSON would silently transform or discard", () => {
+    const project = validProject();
+    const document = {
+      ...project.document,
+      content: {
+        ...project.document.content,
+        sections: project.document.content.sections.map(section =>
+          section.id === "extension-1"
+            ? {
+                ...section,
+                entries: [{
+                  ...section.entries[0],
+                  content: { generatedAt: new Date("2026-01-01T00:00:00.000Z") },
+                }],
+              }
+            : section,
+        ),
+      },
+    };
+    const result = validateCVProject({ ...project, document });
+    expect(result.issues).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        code: "serialization-failed",
+        path: "$.document.content.sections[2].entries[0].content.generatedAt",
+      }),
+    ]));
+  });
+
   it("does not mutate the supplied project", () => {
     const project = validProject();
     const before = structuredClone(project);
