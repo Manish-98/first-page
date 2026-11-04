@@ -57,4 +57,26 @@ describe("CVDocumentPage", () => {
     fireEvent.click(screen.getByRole("button", { name: "Save personal details" }));
     expect(getActiveCV()?.content.personalDetails.contact).toEqual({ profiles: [{ label: "LinkedIn", url: "https://linkedin.com/in/ada" }] });
   });
+
+  it("preserves the other form's unsaved draft when either form is saved", () => {
+    setActiveCV(fixture());
+    render(<CVDocumentPage editingDependencies={dependencies} />);
+
+    fireEvent.change(screen.getByLabelText("Given name"), { target: { value: "Unsaved Ada" } });
+    fireEvent.change(screen.getByLabelText("Summary"), { target: { value: "Saved summary" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save summary" }));
+
+    expect(screen.getByLabelText("Given name")).toHaveValue("Unsaved Ada");
+    expect(getActiveCV()?.content.personalDetails).toEqual({});
+    expect(getActiveCV()?.content.sections[0].entries[0].content).toEqual({ text: "Saved summary" });
+
+    fireEvent.change(screen.getByLabelText("Summary"), { target: { value: "Unsaved summary draft" } });
+    fireEvent.change(screen.getByLabelText("Given name"), { target: { value: "Saved Ada" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save personal details" }));
+
+    expect(screen.getByLabelText("Summary")).toHaveValue("Unsaved summary draft");
+    expect(getActiveCV()?.content.personalDetails).toEqual({ name: { givenName: "Saved Ada" } });
+    expect(getActiveCV()?.content.sections[0].entries[0].content).toEqual({ text: "Saved summary" });
+  });
+
 });
