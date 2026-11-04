@@ -4,8 +4,10 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import CVEditorWorkspace from "./CVEditorWorkspace";
 
 const originalMatchMedia = window.matchMedia;
+const originalInnerWidth = window.innerWidth;
 
 function setViewport(isMobile: boolean) {
+  Object.defineProperty(window, "innerWidth", { configurable: true, value: isMobile ? 768 : 1280 });
   window.matchMedia = vi.fn().mockImplementation((query: string) => ({
     matches: query === "(max-width: 960px)" && isMobile,
     media: query,
@@ -33,6 +35,7 @@ function renderWorkspace() {
 describe("CVEditorWorkspace", () => {
   afterEach(() => {
     window.matchMedia = originalMatchMedia;
+    Object.defineProperty(window, "innerWidth", { configurable: true, value: originalInnerWidth });
   });
 
   it("renders the three workspace regions on desktop", () => {
