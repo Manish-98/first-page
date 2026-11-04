@@ -8,6 +8,7 @@ import { useActiveCV } from "../hooks/useActiveCV";
 import AppLink from "./AppLink";
 import ContentSection from "./ContentSection";
 import CVPreview from "./CVPreview";
+import ExperienceEditor from "./ExperienceEditor";
 
 interface Props { editingDependencies: CVCreationDependencies }
 const emptyDetails: PersonalDetails = {};
@@ -141,6 +142,7 @@ export default function CVDocumentPage({ editingDependencies }: Props) {
               <button className="button button--primary" type="submit">Save summary</button>
             </form>
           </section>
+          <ExperienceEditor document={activeDocument} editingDependencies={editingDependencies} />
         </div>
         <CVPreview document={activeDocument} />
       </div>
