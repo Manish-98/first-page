@@ -178,9 +178,10 @@ export default function ExperienceEditor({ document, editingDependencies }: Prop
     const errorKey = "dateRange." + key + "Date";
     return (
       <label className="cv-field experience-date-field">
-        <span>{label}</span>
-        <input type="number" min={part === "Year" ? 1 : 1} max={part === "Year" ? 9999 : part === "Month" ? 12 : 31}
+        <span>{key === "start" ? "Start " : "End "}{label}</span>
+        <input type="number" min={1} max={part === "Year" ? 9999 : part === "Month" ? 12 : 31}
           step="1" inputMode="numeric" placeholder={hint} value={draft[fieldKey] as string}
+          disabled={key === "end" && draft.ongoing}
           onChange={event => updateDraft(fieldKey, event.target.value as never)}
           aria-invalid={Boolean(fieldErrors[errorKey])}
           aria-describedby={fieldErrors[errorKey] ? errorKey.replace(".", "-") : undefined} />
