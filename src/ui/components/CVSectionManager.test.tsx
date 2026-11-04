@@ -1,0 +1,14 @@
+// @vitest-environment jsdom
+import { describe, expect, it } from "vitest";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { createCVDocument } from "../../domain/cv/operations";
+import type { CVSection } from "../../domain/cv/types";
+import CVSectionManager from "./CVSectionManager";
+const section=(id:string,kind:string,content:unknown):CVSection=>({id,kind,entries:[{id:`${id}-entry`,content}]});
+const fixture=()=>{const result=createCVDocument({id:"cv-ui",title:"CV",createdAt:"2026-11-04T10:00:00.000Z",sections:[section("summary","summary",{text:"Profile"}),section("skills","skills",{name:"TypeScript"})]});if(!result.ok)throw new Error("Fixture failed");return result.value;};
+const dependencies={generateId:()=>"new-section-id",now:()=>"2026-11-04T11:00:00.000Z"};
+describe("CVSectionManager",()=>{
+ it("adds an available empty section and exposes a clear empty state",()=>{let current=fixture();const update=(next:typeof current)=>{current=next;};const view=render(<CVSectionManager document={current} editingDependencies={dependencies} onDocumentChange={update}/>);fireEvent.change(screen.getByLabelText("Add a standard section"),{target:{value:"languages"}});fireEvent.click(screen.getByRole("button",{name:"Add section"}));expect(current.content.sections[2]).toMatchObject({id:"new-section-id",kind:"languages",entries:[]});view.rerender(<CVSectionManager document={current} editingDependencies={dependencies} onDocumentChange={update}/>);expect(screen.getByText("Empty section — add content below")).toBeInTheDocument();});
+ it("reorders with accessible controls and disables boundary moves",()=>{let current=fixture();const update=(next:typeof current)=>{current=next;};const view=render(<CVSectionManager document={current} editingDependencies={dependencies} onDocumentChange={update}/>);expect(screen.getByRole("button",{name:"Move Professional Summary up"})).toBeDisabled();fireEvent.click(screen.getByRole("button",{name:"Move Professional Summary down"}));expect(current.content.sections.map(item=>item.id)).toEqual(["skills","summary"]);view.rerender(<CVSectionManager document={current} editingDependencies={dependencies} onDocumentChange={update}/>);expect(screen.getByRole("button",{name:"Move Professional Summary down"})).toBeDisabled();});
+ it("removes a section and makes it available to add again",()=>{let current=fixture();const update=(next:typeof current)=>{current=next;};const view=render(<CVSectionManager document={current} editingDependencies={dependencies} onDocumentChange={update}/>);fireEvent.click(screen.getByRole("button",{name:"Remove Skills section"}));expect(current.content.sections.map(item=>item.id)).toEqual(["summary"]);view.rerender(<CVSectionManager document={current} editingDependencies={dependencies} onDocumentChange={update}/>);expect(screen.getByRole("option",{name:"Skills"})).toBeInTheDocument();});
+});

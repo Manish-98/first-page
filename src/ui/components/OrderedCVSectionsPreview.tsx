@@ -1,0 +1,57 @@
+import type { CVDocument, CVSection } from "../../domain/cv/types";
+import type { CVPartialDate, EducationSectionContent, ExperienceSectionContent, SkillSectionContent } from "../../domain/cv/sections";
+import AdditionalSectionsPreview from "./AdditionalSectionsPreview";
+import type { AdditionalStandardSectionKind } from "../../application/cv/updateCVStandardSections";
+
+function dateText(date: CVPartialDate | undefined): string | undefined {
+  if (!date) return undefined;
+  const month = date.month === undefined ? undefined : new Intl.DateTimeFormat("en", { month: "short" }).format(new Date(2000, date.month - 1, 1));
+  return [date.day === undefined ? undefined : String(date.day), month, String(date.year)].filter(Boolean).join(" ");
+}
+function sectionEntries<T>(section: CVSection): T[] { return section.entries.map(entry => entry.content as T); }
+function range(value: { startDate?: CVPartialDate; endDate?: CVPartialDate; ongoing?: boolean } | undefined): string {
+  return [dateText(value?.startDate), value?.ongoing ? "Present" : dateText(value?.endDate)].filter(Boolean).join(" – ");
+}
+function renderSection(document: CVDocument, section: CVSection) {
+  const id = `cv-preview-section-${section.id}`;
+  switch (section.kind) {
+    case "summary": {
+      const items = sectionEntries<{ text: string }>(section).filter(item => item.text?.trim());
+      return items.length ? <section className="cv-preview__section" aria-labelledby={id} key={section.id}><h4 id={id}>Professional Summary</h4>{items.map((item,index)=><p className="cv-preview__summary" key={index}>{item.text}</p>)}</section> : null;
+    }
+    case "experience": {
+      const items = sectionEntries<ExperienceSectionContent>(section);
+      return items.length ? <section className="cv-preview__section" aria-labelledby={id} key={section.id}><h4 id={id}>Work Experience</h4>{items.map((item,index)=><div className="cv-preview__experience" key={index}>
+        <h5>{item.role}</h5><p className="cv-preview__experience-meta">{item.employer}{item.location ? ` · ${item.location}` : ""}</p>
+        {range(item.dateRange) && <p className="cv-preview__experience-period">{range(item.dateRange)}</p>}
+        {item.employmentType && <p className="cv-preview__experience-period">{item.employmentType.replace("-", " ")}</p>}
+        {item.description && <p className="cv-preview__summary">{item.description}</p>}
+        {item.responsibilities?.length ? <ul>{item.responsibilities.map((value,i)=><li key={i}>{value}</li>)}</ul> : null}
+        {item.achievements?.length ? <div className="cv-preview__achievements"><strong>Key achievements</strong><ul>{item.achievements.map((value,i)=><li key={i}>{value}</li>)}</ul></div> : null}
+      </div>)}</section> : null;
+    }
+    case "education": {
+      const items = sectionEntries<EducationSectionContent>(section);
+      return items.length ? <section className="cv-preview__section" aria-labelledby={id} key={section.id}><h4 id={id}>Education</h4>{items.map((item,index)=><div className="cv-preview__education" key={index}>
+        <h5>{item.qualification}{item.fieldOfStudy ? ` · ${item.fieldOfStudy}` : ""}</h5>
+        <p className="cv-preview__experience-meta">{item.institution}{item.location ? ` · ${item.location}` : ""}</p>
+        {range(item.dateRange) && <p className="cv-preview__experience-period">{range(item.dateRange)}</p>}
+        {item.grade && <p className="cv-preview__experience-period">Grade: {item.grade}</p>}
+        {item.description && <p className="cv-preview__summary">{item.description}</p>}
+      </div>)}</section> : null;
+    }
+    case "skills": {
+      const items = sectionEntries<SkillSectionContent>(section);
+      return items.length ? <section className="cv-preview__section" aria-labelledby={id} key={section.id}><h4 id={id}>Skills</h4><ul className="cv-preview__skills">{items.map((item,index)=><li key={index}>
+        <strong>{item.name}</strong>{item.category && <span>{item.category}</span>}{item.level && <span>{item.level[0].toUpperCase()+item.level.slice(1)}</span>}{item.keywords?.length ? <span>{item.keywords.join(" · ")}</span> : null}
+      </li>)}</ul></section> : null;
+    }
+    case "projects": case "languages": case "certifications": case "awards":
+    case "volunteering": case "publications": case "interests": case "references":
+      return <AdditionalSectionsPreview document={document} kind={section.kind as AdditionalStandardSectionKind} key={section.id} />;
+    default: return null;
+  }
+}
+export default function OrderedCVSectionsPreview({ document }: { document: CVDocument }) {
+  return <>{document.content.sections.map(section => renderSection(document, section))}</>;
+}

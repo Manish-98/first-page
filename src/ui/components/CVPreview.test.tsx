@@ -121,6 +121,17 @@ describe("CVPreview", () => {
     expect(preview).not.toHaveTextContent("undefined");
   });
 
+  it("renders section content in the canonical document order", () => {
+    render(<CVPreview document={fixture({ personalDetails: {}, sections: [
+      { id: "projects-first", kind: "projects", entries: [{ id: "project", content: { name: "Atlas" } }] },
+      { id: "summary-second", kind: "summary", entries: [{ id: "summary", content: { text: "Profile text" } }] },
+      { id: "skills-third", kind: "skills", entries: [{ id: "skill", content: { name: "TypeScript" } }] },
+      { id: "experience-fourth", kind: "experience", entries: [{ id: "role", content: { role: "Engineer", employer: "Example" } }] },
+    ] })} />);
+    const headings = Array.from(screen.getByRole("article", { name: "CV preview" }).querySelectorAll(".cv-preview__section h4")).map(heading => heading.textContent);
+    expect(headings).toEqual(["Projects", "Professional Summary", "Skills", "Work Experience"]);
+  });
+
   it("does not create unsafe external links from malformed URLs", () => {
     render(<CVPreview document={fixture({
       personalDetails: { contact: {
