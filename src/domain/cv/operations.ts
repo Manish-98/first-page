@@ -64,6 +64,52 @@ export function updateContactDetails<T extends CVSection>(doc: CVDocument<T>, up
 export function updatePostalAddress<T extends CVSection>(doc: CVDocument<T>, updates: Partial<PostalAddress>, at: ISODateTimeString): CVOperationResult<CVDocument<T>> { return updateContactDetails(doc, { address: { ...doc.content.personalDetails.contact?.address, ...updates } }, at); }
 const hasEntryId = <T extends CVSection>(doc: CVDocument<T>, id: CVEntryId): boolean => doc.content.sections.some(s => s.entries.some(e => e.id === id));
 const sectionIndex = <T extends CVSection>(doc: CVDocument<T>, id: CVSectionId): number => doc.content.sections.findIndex(s => s.id === id);
+
+/**
+ * Reorders the canonical sections array. A no-op move returns the original
+ * document (including its timestamp); an actual move updates updatedAt.
+ */
+export function moveSectionToPosition<T extends CVSection>(
+  doc: CVDocument<T>,
+  id: CVSectionId,
+  position: number,
+  at: ISODateTimeString,
+): CVOperationResult<CVDocument<T>> {
+  const currentIndex = sectionIndex(doc, id);
+  if (currentIndex < 0) return failure("section-not-found", `Section '${id}' was not found.`, { documentId: doc.id, sectionId: id });
+  const sections = doc.content.sections;
+  if (!Number.isInteger(position) || position < 0 || position >= sections.length) {
+    return failure("invalid-index", `Section position ${position} is out of bounds.`, { documentId: doc.id, sectionId: id });
+  }
+  if (currentIndex === position) return success(doc);
+
+  const reordered = [...sections];
+  const [section] = reordered.splice(currentIndex, 1);
+  reordered.splice(position, 0, section);
+  return success(withUpdatedAt(doc, at, { ...doc.content, sections: reordered }));
+}
+
+export function moveSectionUp<T extends CVSection>(
+  doc: CVDocument<T>,
+  id: CVSectionId,
+  at: ISODateTimeString,
+): CVOperationResult<CVDocument<T>> {
+  const currentIndex = sectionIndex(doc, id);
+  if (currentIndex < 0) return failure("section-not-found", `Section '${id}' was not found.`, { documentId: doc.id, sectionId: id });
+  if (currentIndex === 0) return success(doc);
+  return moveSectionToPosition(doc, id, currentIndex - 1, at);
+}
+
+export function moveSectionDown<T extends CVSection>(
+  doc: CVDocument<T>,
+  id: CVSectionId,
+  at: ISODateTimeString,
+): CVOperationResult<CVDocument<T>> {
+  const currentIndex = sectionIndex(doc, id);
+  if (currentIndex < 0) return failure("section-not-found", `Section '${id}' was not found.`, { documentId: doc.id, sectionId: id });
+  if (currentIndex === doc.content.sections.length - 1) return success(doc);
+  return moveSectionToPosition(doc, id, currentIndex + 1, at);
+}
 export function addSection<T extends CVSection>(doc: CVDocument<T>, section: T, at: ISODateTimeString, index = doc.content.sections.length): CVOperationResult<CVDocument<T>> {
   if (doc.content.sections.some(s => s.id === section.id)) return failure("duplicate-section-id", `Section '${section.id}' already exists.`, { documentId: doc.id, sectionId: section.id });
   const ids = new Set<string>();

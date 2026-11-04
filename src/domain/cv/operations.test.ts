@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addEntry, addSection, createCVDocument, duplicateEntry, removeEntry, removeSection, updateContactDetails, updateCustomField, updateDocumentMetadata, updateEntry, updatePersonName, updatePostalAddress, updateSection, type CVOperationResult } from "./operations";
+import { addEntry, addSection, createCVDocument, duplicateEntry, moveSectionDown, moveSectionToPosition, moveSectionUp, removeEntry, removeSection, updateContactDetails, updateCustomField, updateDocumentMetadata, updateEntry, updatePersonName, updatePostalAddress, updateSection, type CVOperationResult } from "./operations";
 import type { CVDocument, CVSection } from "./types";
 import type { CustomCVSection } from "./sections";
 type Summary = CVSection<"summary", { text: string }>;
@@ -37,6 +37,70 @@ describe("CV document operations", () => {
     expect(value(removeSection(doc, "summary", at)).content.sections).toEqual([experience]);
     expect(removeSection(doc, "missing", at)).toMatchObject({ ok: false, error: { code: "section-not-found" } });
   });
+  it("moves sections deterministically while preserving identity, content and source state", () => {
+    const education: CVSection<"education", { institution: string }> = {
+      id: "education",
+      kind: "education",
+      title: "Education",
+      entries: [{ id: "education-entry", content: { institution: "Example University" } }],
+    };
+    const withEducation: CVDocument<Summary | Experience | typeof education> = {
+      ...doc,
+      content: { ...doc.content, sections: [summary, experience, education] },
+    };
+    const originalSnapshot = structuredClone(withEducation);
+
+    const up = value(moveSectionUp(withEducation, "experience", at));
+    expect(up.content.sections.map(section => section.id)).toEqual(["experience", "summary", "education"]);
+    expect(up.content.sections[0]).toBe(experience);
+    expect(up.content.sections[1]).toBe(summary);
+    expect(up.content.sections[2]).toBe(education);
+    expect(up.metadata.updatedAt).toBe(at);
+
+    const down = value(moveSectionDown(up, "experience", "2026-02-02"));
+    expect(down.content.sections.map(section => section.id)).toEqual(["summary", "experience", "education"]);
+    expect(down.content.sections[1].entries[0]).toBe(experience.entries[0]);
+
+    const toFirst = value(moveSectionToPosition(withEducation, "education", 0, at));
+    expect(toFirst.content.sections.map(section => section.id)).toEqual(["education", "summary", "experience"]);
+    const toLast = value(moveSectionToPosition(toFirst, "education", 2, at));
+    expect(toLast.content.sections.map(section => section.id)).toEqual(["summary", "experience", "education"]);
+
+    expect(value(moveSectionUp(withEducation, "summary", at))).toBe(withEducation);
+    expect(value(moveSectionDown(withEducation, "education", at))).toBe(withEducation);
+    expect(value(moveSectionToPosition(withEducation, "summary", 0, at))).toBe(withEducation);
+    expect(withEducation).toEqual(originalSnapshot);
+  });
+
+  it("supports custom sections and repeated moves without changing their payloads", () => {
+    const custom: CustomCVSection = {
+      id: "custom",
+      kind: "custom",
+      title: "Additional",
+      entries: [{ id: "custom-entry", content: { description: "Custom content", fields: [] } }],
+    };
+    const customDoc: CVDocument<Summary | Experience | CustomCVSection> = {
+      ...doc,
+      content: { ...doc.content, sections: [summary, experience, custom] },
+    };
+    const movedOnce = value(moveSectionDown(customDoc, "summary", at));
+    const movedTwice = value(moveSectionDown(movedOnce, "summary", at));
+    const movedBack = value(moveSectionUp(movedTwice, "summary", at));
+    expect(movedTwice.content.sections.map(section => section.id)).toEqual(["experience", "custom", "summary"]);
+    expect(movedBack.content.sections.map(section => section.id)).toEqual(["experience", "summary", "custom"]);
+    expect(movedBack.content.sections[2]).toBe(custom);
+    expect(movedBack.content.sections[2].entries[0].content).toBe(custom.entries[0].content);
+  });
+
+  it("returns safe structured errors for unknown sections and invalid target positions", () => {
+    expect(moveSectionUp(doc, "missing", at)).toMatchObject({ ok: false, error: { code: "section-not-found", documentId: "cv-1", sectionId: "missing" } });
+    expect(moveSectionDown(doc, "missing", at)).toMatchObject({ ok: false, error: { code: "section-not-found" } });
+    expect(moveSectionToPosition(doc, "missing", 0, at)).toMatchObject({ ok: false, error: { code: "section-not-found" } });
+    for (const position of [-1, 2, 1.5, Number.NaN, Number.POSITIVE_INFINITY]) {
+      expect(moveSectionToPosition(doc, "summary", position, at)).toMatchObject({ ok: false, error: { code: "invalid-index", sectionId: "summary" } });
+    }
+  });
+
   it("rejects payloads that do not match the target section kind", () => {
     const experiencePayload = { role: "Engineer", employer: "Example Ltd" };
     expect(addEntry(doc, "summary", { id: "wrong-add", content: experiencePayload }, at)).toMatchObject({ ok: false, error: { code: "entry-content-kind-mismatch", sectionId: "summary", entryId: "wrong-add" } });
