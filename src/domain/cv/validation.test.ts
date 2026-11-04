@@ -113,6 +113,32 @@ describe("validateCVDocument", () => {
     ]));
   });
 
+  it("validates credential URLs without over-interpreting partial certification dates", () => {
+    const document = validDocument();
+    document.content.sections.push({
+      id: "certifications",
+      kind: "certifications",
+      entries: [{
+        id: "certification-1",
+        content: {
+          name: "Example certificate",
+          issuedOn: { year: 2024 },
+          expiresOn: { year: 2024, month: 1 },
+          credentialUrl: "not-a-url",
+        },
+      }],
+    });
+    expect(validateCVDocument(document).issues).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        code: "invalid-url",
+        path: "$.content.sections[2].entries[0].content.credentialUrl",
+      }),
+    ]));
+    expect(validateCVDocument(document).issues).not.toEqual(expect.arrayContaining([
+      expect.objectContaining({ code: "invalid-date-range" }),
+    ]));
+  });
+
   it("accepts structurally valid unknown extension section kinds", () => {
     const extension = validDocument();
     extension.content.sections.push({ id: "extension", kind: "timeline-extension", entries: [{ id: "extension-entry", content: { arbitrary: true } }] });
