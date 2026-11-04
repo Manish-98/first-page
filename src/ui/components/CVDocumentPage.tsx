@@ -9,6 +9,8 @@ import AppLink from "./AppLink";
 import ContentSection from "./ContentSection";
 import CVPreview from "./CVPreview";
 import ExperienceEditor from "./ExperienceEditor";
+import EducationEditor from "./EducationEditor";
+import SkillsEditor from "./SkillsEditor";
 
 interface Props { editingDependencies: CVCreationDependencies }
 const emptyDetails: PersonalDetails = {};
@@ -143,6 +145,8 @@ export default function CVDocumentPage({ editingDependencies }: Props) {
             </form>
           </section>
           <ExperienceEditor document={activeDocument} editingDependencies={editingDependencies} />
+          <EducationEditor document={activeDocument} editingDependencies={editingDependencies} />
+          <SkillsEditor document={activeDocument} editingDependencies={editingDependencies} />
         </div>
         <CVPreview document={activeDocument} />
       </div>
