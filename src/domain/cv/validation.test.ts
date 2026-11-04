@@ -93,6 +93,18 @@ describe("validateCVDocument", () => {
     expect(validateCVDocument(invalid).issues).toEqual(expect.arrayContaining([
       expect.objectContaining({ code: "invalid-date-range" }),
     ]));
+    const ambiguous = validDocument();
+    ambiguous.content.sections[0].entries[0].content.dateRange = {
+      startDate: { year: 2024, month: 12 },
+      endDate: { year: 2024 },
+    };
+    expect(validateCVDocument(ambiguous).issues).not.toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        code: "invalid-date-range",
+        path: "$.content.sections[0].entries[0].content.dateRange.endDate",
+      }),
+    ]));
+
     const nonLeap = validDocument();
     nonLeap.content.sections[0].entries[0].content.dateRange = { startDate: { year: 2023, month: 2, day: 29 } };
     expect(validateCVDocument(nonLeap).issues).toEqual(expect.arrayContaining([
@@ -126,12 +138,22 @@ describe("validateCVDocument", () => {
           expiresOn: { year: 2024, month: 1 },
           credentialUrl: "not-a-url",
         },
+      }, {
+        id: "certification-2",
+        content: {
+          name: "Example certificate with unsafe URL",
+          credentialUrl: "javascript:alert(1)",
+        },
       }],
     });
     expect(validateCVDocument(document).issues).toEqual(expect.arrayContaining([
       expect.objectContaining({
         code: "invalid-url",
         path: "$.content.sections[2].entries[0].content.credentialUrl",
+      }),
+      expect.objectContaining({
+        code: "invalid-url",
+        path: "$.content.sections[2].entries[1].content.credentialUrl",
       }),
     ]));
     expect(validateCVDocument(document).issues).not.toEqual(expect.arrayContaining([
