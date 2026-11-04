@@ -1,0 +1,198 @@
+import { useEffect, useRef, useState, type ReactNode, type KeyboardEvent } from "react";
+
+type Drawer = "left" | "right" | null;
+
+interface CVEditorWorkspaceProps {
+  title: string;
+  leftPanel: ReactNode;
+  rightPanel: ReactNode;
+  children: ReactNode;
+}
+
+function isNarrowViewport(): boolean {
+  return typeof window !== "undefined"
+    && typeof window.matchMedia === "function"
+    && window.matchMedia("(max-width: 960px)").matches;
+}
+
+export default function CVEditorWorkspace({
+  title,
+  leftPanel,
+  rightPanel,
+  children,
+}: CVEditorWorkspaceProps) {
+  const [isMobile, setIsMobile] = useState(isNarrowViewport);
+  const [leftCollapsed, setLeftCollapsed] = useState(false);
+  const [rightCollapsed, setRightCollapsed] = useState(false);
+  const [activeDrawer, setActiveDrawer] = useState<Drawer>(null);
+  const leftTriggerRef = useRef<HTMLButtonElement>(null);
+  const rightTriggerRef = useRef<HTMLButtonElement>(null);
+  const drawerCloseRef = useRef<HTMLButtonElement>(null);
+  const drawerRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 960px)");
+    const updateViewport = () => {
+      setIsMobile(mediaQuery.matches);
+      setActiveDrawer(null);
+    };
+
+    updateViewport();
+    mediaQuery.addEventListener("change", updateViewport);
+    return () => mediaQuery.removeEventListener("change", updateViewport);
+  }, []);
+
+  useEffect(() => {
+    if (!isMobile || !activeDrawer) return;
+
+    const previouslyFocused = document.activeElement instanceof HTMLElement
+      ? document.activeElement
+      : null;
+    drawerCloseRef.current?.focus();
+
+    return () => {
+      previouslyFocused?.focus();
+    };
+  }, [activeDrawer, isMobile]);
+
+  useEffect(() => {
+    if (!isMobile || !activeDrawer) return;
+
+    const dismissOnEscape = (event: globalThis.KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setActiveDrawer(null);
+      }
+    };
+
+    document.addEventListener("keydown", dismissOnEscape);
+    return () => document.removeEventListener("keydown", dismissOnEscape);
+  }, [activeDrawer, isMobile]);
+
+  function openDrawer(drawer: Exclude<Drawer, null>) {
+    if (drawer === "left") leftTriggerRef.current?.focus();
+    else rightTriggerRef.current?.focus();
+    setActiveDrawer(drawer);
+  }
+
+  function handleDrawerKeyDown(event: KeyboardEvent<HTMLElement>) {
+    if (event.key !== "Tab" || !drawerRef.current) return;
+
+    const focusable = Array.from(
+      drawerRef.current.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      ),
+    ).filter(element => element.offsetParent !== null);
+
+    if (focusable.length === 0) {
+      event.preventDefault();
+      drawerCloseRef.current?.focus();
+      return;
+    }
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
+
+  const drawerOpen = isMobile && activeDrawer !== null;
+  const leftIsOpen = isMobile ? activeDrawer === "left" : !leftCollapsed;
+  const rightIsOpen = isMobile ? activeDrawer === "right" : !rightCollapsed;
+
+  return (
+    <section className="editor-workspace" aria-label={`CV editor workspace for ${title}`}
+      data-mobile={isMobile ? "true" : "false"}
+      data-left-collapsed={!isMobile && leftCollapsed ? "true" : "false"}
+      data-right-collapsed={!isMobile && rightCollapsed ? "true" : "false"}>
+      <div className="editor-workspace__toolbar">
+        <div className="editor-workspace__panel-controls">
+          <button
+            ref={leftTriggerRef}
+            className="editor-workspace__toggle"
+            type="button"
+            aria-controls="editor-tools-panel"
+            aria-expanded={leftIsOpen}
+            onClick={() => isMobile
+              ? (activeDrawer === "left" ? setActiveDrawer(null) : openDrawer("left"))
+              : setLeftCollapsed(current => !current)}
+          >
+            {leftIsOpen ? "Hide tools" : "Show tools"}
+          </button>
+          <span className="editor-workspace__separator" aria-hidden="true" />
+          <span className="editor-workspace__document-name">{title}</span>
+        </div>
+        <button
+          ref={rightTriggerRef}
+          className="editor-workspace__toggle"
+          type="button"
+          aria-controls="editor-properties-panel"
+          aria-expanded={rightIsOpen}
+          onClick={() => isMobile
+            ? (activeDrawer === "right" ? setActiveDrawer(null) : openDrawer("right"))
+            : setRightCollapsed(current => !current)}
+        >
+          {rightIsOpen ? "Hide properties" : "Show properties"}
+        </button>
+      </div>
+
+      {drawerOpen && (
+        <button
+          className="editor-workspace__backdrop"
+          type="button"
+          aria-label="Close panel"
+          onClick={() => setActiveDrawer(null)}
+        />
+      )}
+
+      <div className="editor-workspace__layout">
+        <aside
+          id="editor-tools-panel"
+          className={`editor-panel editor-panel--left${isMobile && activeDrawer === "left" ? " editor-panel--drawer-open" : ""}`}
+          aria-label="Tools and sections"
+          aria-hidden={isMobile && activeDrawer !== "left"}
+          inert={isMobile && activeDrawer !== "left"}
+          role={isMobile ? "dialog" : undefined}
+          aria-modal={isMobile && activeDrawer === "left" ? true : undefined}
+          aria-labelledby={isMobile ? "editor-tools-title" : undefined}
+          ref={isMobile && activeDrawer === "left" ? drawerRef : undefined}
+          onKeyDown={isMobile && activeDrawer === "left" ? handleDrawerKeyDown : undefined}
+        >
+          <div className="editor-panel__heading">
+            <h2 id="editor-tools-title">Tools and sections</h2>
+            {isMobile && <button ref={drawerCloseRef} className="editor-panel__close" type="button" onClick={() => setActiveDrawer(null)}>Close</button>}
+          </div>
+          <div className="editor-panel__content">{leftPanel}</div>
+        </aside>
+
+        <div className="editor-workspace__canvas" aria-hidden={drawerOpen} inert={drawerOpen}>
+          {children}
+        </div>
+
+        <aside
+          id="editor-properties-panel"
+          className={`editor-panel editor-panel--right${isMobile && activeDrawer === "right" ? " editor-panel--drawer-open" : ""}`}
+          aria-label="Contextual properties"
+          aria-hidden={isMobile && activeDrawer !== "right"}
+          inert={isMobile && activeDrawer !== "right"}
+          role={isMobile ? "dialog" : undefined}
+          aria-modal={isMobile && activeDrawer === "right" ? true : undefined}
+          aria-labelledby={isMobile ? "editor-properties-title" : undefined}
+          ref={isMobile && activeDrawer === "right" ? drawerRef : undefined}
+          onKeyDown={isMobile && activeDrawer === "right" ? handleDrawerKeyDown : undefined}
+        >
+          <div className="editor-panel__heading">
+            <h2 id="editor-properties-title">Properties</h2>
+            {isMobile && <button ref={drawerCloseRef} className="editor-panel__close" type="button" onClick={() => setActiveDrawer(null)}>Close</button>}
+          </div>
+          <div className="editor-panel__content">{rightPanel}</div>
+        </aside>
+      </div>
+    </section>
+  );
+}
