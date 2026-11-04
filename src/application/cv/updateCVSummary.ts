@@ -1,4 +1,4 @@
-import { addSection, removeEntry, removeSection, updateEntry } from "../../domain/cv/operations";
+import { addSection, removeEntry, removeSection, updateEntry, updateSection } from "../../domain/cv/operations";
 import type { CVDocument, CVSection } from "../../domain/cv/types";
 import type { CVCreationDependencies } from "./createCV";
 
@@ -28,6 +28,12 @@ export function updateCVSummary(
 
   if (section?.entries[0]) {
     const result = updateEntry(document, section.id, section.entries[0].id, { text: value }, dependencies.now());
+    return result.ok ? { ok: true, document: result.value } : { ok: false, message: result.error.message };
+  }
+
+  if (section) {
+    const entries = [{ id: dependencies.generateId(), content: { text: value } }];
+    const result = updateSection(document, section.id, { entries }, dependencies.now());
     return result.ok ? { ok: true, document: result.value } : { ok: false, message: result.error.message };
   }
 
