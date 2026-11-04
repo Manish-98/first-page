@@ -31,6 +31,7 @@ export default function CVDocumentCanvas({ document }: { document: CVDocument })
     "--cv-page-margin": `${A4_PAGE.margin}px`,
     "--cv-content-width": `${A4_CONTENT_WIDTH}px`,
     "--cv-content-height": `${A4_CONTENT_HEIGHT}px`,
+    "--cv-page-count": pageCount,
   } as CSSProperties;
 
   return (
@@ -41,18 +42,10 @@ export default function CVDocumentCanvas({ document }: { document: CVDocument })
       </div>
       <div className="cv-document-canvas__viewport">
         <div className="cv-document-canvas__pages" data-page-count={pageCount}>
-          {Array.from({ length: pageCount }, (_, index) => (
-            <div className="cv-document-canvas__page" key={index} aria-hidden="true">
-              <div className="cv-document-canvas__page-content" style={{ top: `${A4_PAGE.margin - index * A4_CONTENT_HEIGHT}px` } as CSSProperties}>
-                <CVPreview document={document} />
-              </div>
-              <span className="cv-document-canvas__page-number">{index + 1}</span>
-            </div>
-          ))}
+          <div className="cv-document-canvas__flow">
+            <CVPreview document={document} />
+          </div>
         </div>
-      </div>
-      <div className="cv-document-canvas__accessible-content">
-        <CVPreview document={document} />
       </div>
       <div className="cv-document-canvas__measure" ref={measureRef} aria-hidden="true" inert>
         <CVPreview document={document} />
