@@ -654,3 +654,45 @@ h1 em { color: var(--color-accent); font-weight: 400; }
   .cv-preview { min-height: 360px; }
   .cv-preview__empty { min-height: 300px; }
 }
+
+/* Work experience editor */
+.experience-section__heading,
+.experience-form__actions,
+.experience-entry__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.experience-section__heading h2 { margin-bottom: 0; }
+.experience-entry-list { margin: 22px 0 0; padding: 0; list-style: none; }
+.experience-entry { display: flex; justify-content: space-between; gap: 16px; border-top: 1px solid var(--color-border); padding: 18px 0; }
+.experience-entry__content { min-width: 0; }
+.experience-entry__content h3, .experience-form h3 { margin: 0 0 6px; font-family: var(--font-display); font-size: 1.35rem; font-weight: 400; }
+.experience-entry__content p { color: var(--color-muted); font-size: .88rem; line-height: 1.6; }
+.experience-entry__meta { margin: 0; font-weight: 650; }
+.experience-entry__period { margin: 4px 0; font-size: .8rem !important; }
+.experience-entry__content ul { padding-left: 20px; color: var(--color-muted); font-size: .86rem; line-height: 1.6; }
+.experience-entry__actions { align-items: flex-start; flex: 0 0 auto; }
+.experience-form { display: grid; gap: 18px; margin-top: 22px; border-top: 1px solid var(--color-border); padding-top: 22px; }
+.experience-form .cv-field select { width: 100%; min-width: 0; border: 1px solid var(--color-control-border); border-radius: 8px; padding: 11px 12px; background: white; color: var(--color-ink); font: inherit; }
+.experience-dates { margin: 0; border: 1px solid var(--color-border); border-radius: 10px; padding: 16px; }
+.experience-dates legend { padding: 0 6px; color: var(--color-muted); font-size: .88rem; font-weight: 650; }
+.experience-date-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.experience-date-group h4 { margin: 0 0 10px; font-size: .88rem; font-weight: 650; }
+.experience-date-fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.experience-date-field input:disabled { background: var(--color-canvas); color: var(--color-subtle); }
+.experience-ongoing { display: flex; align-items: center; gap: 9px; margin-top: 16px; color: var(--color-muted); font-size: .9rem; }
+.experience-ongoing input { width: 17px; height: 17px; accent-color: var(--color-accent); }
+.experience-form__actions { justify-content: flex-start; }
+.cv-preview__experience { margin-top: 16px; }
+.cv-preview__experience h5 { margin: 0 0 4px; font-family: var(--font-display); font-size: 1.08rem; font-weight: 600; }
+.cv-preview__experience-meta { margin: 0; color: var(--color-ink); font-size: .84rem; font-weight: 650; line-height: 1.5; }
+.cv-preview__experience-period { margin: 3px 0 8px; color: var(--color-subtle); font-size: .76rem; }
+.cv-preview__experience ul { margin: 8px 0; padding-left: 20px; color: var(--color-muted); font-size: .82rem; line-height: 1.6; }
+.cv-preview__achievements { margin-top: 8px; color: var(--color-muted); font-size: .82rem; }
+@media (max-width: 620px) {
+  .experience-date-grid { grid-template-columns: 1fr; }
+  .experience-entry { flex-direction: column; }
+  .experience-entry__actions { justify-content: flex-start; }
+}
