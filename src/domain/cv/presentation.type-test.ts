@@ -91,11 +91,11 @@ export const sameFactsWithDifferentDesigns = [
 export const preservedSummaryText: string =
   sameFactsWithDifferentDesigns[1].document.content.sections[0].entries[0].content.text;
 
-// @ts-expect-error Layout configuration cannot be stored as factual CV content.
 export const invalidContentWithLayout: CVDocument<SummarySection> = {
   ...factualDocument,
   content: {
     ...factualDocument.content,
+    // @ts-expect-error Layout configuration cannot be stored as factual CV content.
     layout: compactDesign.layout,
   },
 };
