@@ -7,7 +7,6 @@ import CVDocumentPage from "../components/CVDocumentPage";
 
 const routeTable = {
   "/": WelcomePanel,
-  "/cv": CVDocumentPage,
 } as const;
 
 interface AppRoutesProps {
