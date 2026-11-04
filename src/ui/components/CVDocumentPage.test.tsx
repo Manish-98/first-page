@@ -79,7 +79,6 @@ describe("CVDocumentPage", () => {
     expect(getActiveCV()?.content.sections[0].entries[0].content).toEqual({ text: "Saved summary" });
   });
 
-
   it("preserves personal and summary drafts when education and skills are saved", () => {
     setActiveCV(fixture());
     render(<CVDocumentPage editingDependencies={dependencies} />);
@@ -103,6 +102,31 @@ describe("CVDocumentPage", () => {
     expect(screen.getByLabelText("Summary")).toHaveValue("Unsaved summary");
     expect(getActiveCV()?.content.sections.find(section => section.kind === "education")?.entries).toHaveLength(1);
     expect(getActiveCV()?.content.sections.find(section => section.kind === "skills")?.entries).toHaveLength(1);
+  });
+
+  it("clears the summary editor when its section is removed and does not recreate it on save", () => {
+    setActiveCV({
+      ...fixture(),
+      content: {
+        personalDetails: {},
+        sections: [{
+          id: "summary-section",
+          kind: "summary",
+          title: "Professional Summary",
+          entries: [{ id: "summary-entry", content: { text: "Saved summary text" } }],
+        }],
+      },
+    });
+    render(<CVDocumentPage editingDependencies={dependencies} />);
+
+    expect(screen.getByLabelText("Summary")).toHaveValue("Saved summary text");
+    fireEvent.click(screen.getByRole("button", { name: "Remove Professional Summary section" }));
+
+    expect(screen.getByLabelText("Summary")).toHaveValue("");
+    expect(getActiveCV()?.content.sections.some(section => section.kind === "summary")).toBe(false);
+
+    fireEvent.click(screen.getByRole("button", { name: "Save summary" }));
+    expect(getActiveCV()?.content.sections.some(section => section.kind === "summary")).toBe(false);
   });
 
   it("shows only committed details and summary in the live preview", () => {

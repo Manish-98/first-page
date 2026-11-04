@@ -65,6 +65,12 @@ export default function CVDocumentPage({ editingDependencies }: Props) {
     }));
 
   function saveSectionDocument(updatedDocument: typeof activeDocument) {
+    const hadSummarySection = activeDocument.content.sections.some(section => section.kind === "summary");
+    const hasSummarySection = updatedDocument.content.sections.some(section => section.kind === "summary");
+    if (hadSummarySection && !hasSummarySection) {
+      setSummary("");
+      setSummaryError("");
+    }
     lastSavedForm.current = "section";
     setActiveCV(updatedDocument);
   }
