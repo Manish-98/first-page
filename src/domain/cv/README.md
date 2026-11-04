@@ -1,6 +1,6 @@
 # Core CV domain model
 
-This module defines the foundational, platform-independent CV document contracts introduced by issue #27, the concrete section payloads introduced by issue #28, independent design composition introduced by issue #29, immutable document operations introduced by issue #30, and pure document validation introduced by issue #31.
+This module defines the foundational, platform-independent CV document contracts introduced by issue #27, the concrete section payloads introduced by issue #28, independent design composition introduced by issue #29, immutable document operations introduced by issue #30, pure document validation introduced by issue #31, and the versioned portable project format introduced by issue #33.
 
 ## Model structure
 
@@ -48,9 +48,9 @@ This module defines the foundational, platform-independent CV document contracts
 
 ## Scope boundary
 
-This module owns factual CV contracts and deterministic immutable transformations, plus independent design composition. Editor forms, UI behavior, persistence, undo/redo, pagination, rendering, document-import/export, and the versioned serialized project schema remain outside this scope.
+This module owns factual CV contracts, deterministic immutable transformations, independent design composition, runtime validation, and the portable project serialization contract. File picker/browser APIs, filesystem persistence, save/open UI, undo/redo, pagination, and rendering remain outside this domain boundary.
 
-`types.type-test.ts`, `sections.type-test.ts`, and `presentation.type-test.ts` contain compile-time contract fixtures. `presentation.test.ts`, `operations.test.ts`, and `validation.test.ts` contain executable unit tests for pure domain operations, validation rules, and immutability guarantees.
+`types.type-test.ts`, `sections.type-test.ts`, and `presentation.type-test.ts` contain compile-time contract fixtures. `presentation.test.ts`, `operations.test.ts`, `validation.test.ts`, and `project.test.ts` contain executable unit tests for pure domain operations, validation, project round trips, and immutability guarantees.
 
 
 ## Runtime document validation
@@ -62,3 +62,17 @@ Each issue has a stable `code`, `category` (`structure`, `format`, or `invariant
 Validation covers document and metadata shape, identifier presence and uniqueness, personal/contact data, standard section payloads, custom-field discriminants and values, partial calendar dates, date-range consistency, supported enums, and HTTP(S) URLs. Partial dates may specify year, year/month, or year/month/day. Leap years and calendar bounds are checked. An ongoing range cannot also contain an end date; clearly reversed ranges are rejected. An absent end date without an explicit ongoing flag remains valid incomplete data.
 
 Missing optional CV information is not a validation failure. The validator checks whether supplied data is structurally and semantically well-formed; it does not score completeness or recommend content. Unknown extension section kinds are accepted when their generic section and entry structure is valid. Their extension-specific payload rules are not inferred in the absence of an extension schema.
+
+
+## Versioned portable project format
+
+`project.ts` defines the canonical JSON project envelope. Version 1 uses the format identifier `first-page-cv-project` and contains the schema version, a factual `CVDocument`, and its associated `CVDesignConfiguration`.
+
+- `validateCVProject(input: unknown)` validates the envelope, reuses `validateCVDocument`, and validates presentation, page, measurement, and section-placement contracts. It returns structured issues with stable codes, categories, and JSONPath-like locations.
+- `serializeCVProject(project)` validates before producing formatted JSON. It emits only the canonical envelope fields and rejects secret-like keys, credentials, transient runtime-state fields, and non-JSON values that would otherwise be silently transformed or discarded, including those nested in extension payloads.
+- `deserializeCVProject(json)` parses and validates untrusted JSON before returning a typed project. Invalid JSON and invalid project data are returned as structured failures; no invalid value is exposed as a project.
+- Unsupported schema versions are rejected explicitly. Version 1 does not guess how to interpret or migrate another version. A future version must add an explicit migration from a known prior version, validate the migrated result against the target contract, and test preservation of supported information.
+- Unknown extension section kinds remain structurally preserved under the existing extension policy. Extension-specific payload semantics are not inferred by the core validator.
+- The project format is an allow-listed envelope, not a dump of application state. Credentials, API keys, authentication material, caches, sessions, and transient runtime state are not portable project data.
+
+The project module does not own file pickers, browser file APIs, persistence adapters, or save/open UI; those are application/infrastructure concerns for the relevant project-file workflow. JSON is the interchange encoding; only JSON-representable values are accepted so serialization cannot silently coerce extension data.
