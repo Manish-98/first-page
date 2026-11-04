@@ -1,20 +1,24 @@
 import { useState, type FormEvent } from "react";
+import type { CVCreationDependencies } from "../../application/cv/createCV";
 import { createCV } from "../../application/cv/createCV";
 import { setActiveCV } from "../../application/cv/cvSession";
-import { browserCVCreationDependencies } from "../../infrastructure/cv/browserCVCreationDependencies";
 import AppLink from "./AppLink";
 import ContentSection from "./ContentSection";
 
 type CreationPath = "blank" | "guided";
 
-export default function NewCVPage() {
+interface NewCVPageProps {
+  creationDependencies: CVCreationDependencies;
+}
+
+export default function NewCVPage({ creationDependencies }: NewCVPageProps) {
   const [path, setPath] = useState<CreationPath | null>(null);
   const [title, setTitle] = useState("");
   const [guidedStep, setGuidedStep] = useState<1 | 2>(1);
   const [error, setError] = useState("");
 
   function createDocument() {
-    const result = createCV(title, browserCVCreationDependencies);
+    const result = createCV(title, creationDependencies);
     if (!result.ok) {
       setError(result.error.message);
       return;
