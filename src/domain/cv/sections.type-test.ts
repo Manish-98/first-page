@@ -21,10 +21,7 @@ const ongoingRange: CVDateRange = {
 const incompleteRange: CVDateRange = { startDate: yearOnly };
 
 // @ts-expect-error An ongoing range cannot also have an end date.
-const invalidOngoingRange: CVDateRange = {
-  endDate: fullDate,
-  ongoing: true,
-};
+const invalidOngoingRange: CVDateRange = { endDate: fullDate, ongoing: true };
 
 const customFields: readonly CustomField[] = [
   { id: "field-1", key: "clearance", label: "Clearance", value: { type: "text", value: "Public" } },
@@ -38,12 +35,7 @@ const customFields: readonly CustomField[] = [
 ];
 
 // @ts-expect-error Unsupported custom field value types are rejected.
-const invalidCustomField: CustomField = {
-  id: "field-invalid",
-  key: "payload",
-  label: "Payload",
-  value: { type: "object", value: { arbitrary: true } },
-};
+const invalidCustomField: CustomField = { id: "field-invalid", key: "payload", label: "Payload", value: { type: "object", value: { arbitrary: true } } };
 
 export const representativeSections = [
   { id: "summary-1", kind: "summary", entries: [{ id: "summary-entry-1", content: { text: "Product engineer." } }] },
