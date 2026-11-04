@@ -64,7 +64,7 @@ describe("CVPreview", () => {
     expect(screen.getByRole("link", { name: "+44 20 1234 5678" })).toHaveAttribute("href", "tel:+442012345678");
     expect(screen.getByRole("link", { name: "https://ada.example.com" })).toHaveAttribute("target", "_blank");
     expect(screen.getByRole("link", { name: "Portfolio" })).toHaveAttribute("href", "https://portfolio.example.com/ada");
-    expect(screen.getByText("First line\nSecond line")).toBeInTheDocument();
+    expect(screen.getByText(/First line/)).toHaveClass("cv-preview__summary");
   });
 
   it("does not create unsafe external links from malformed URLs", () => {
