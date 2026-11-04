@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { CVCreationDependencies } from "../../application/cv/createCV";
 import type { PersonalDetails, ProfileLink } from "../../domain/cv/types";
 import { updateCVPersonalDetails } from "../../application/cv/updateCVPersonalDetails";
@@ -17,14 +17,16 @@ export default function CVDocumentPage({ editingDependencies }: Props) {
   const [summary, setSummary] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [summaryError, setSummaryError] = useState("");
+  const lastSavedForm = useRef<"details" | "summary" | null>(null);
 
   useEffect(() => {
     if (!document) return;
-    setDetails(document.content.personalDetails);
+    if (lastSavedForm.current !== "details") setDetails(document.content.personalDetails);
     const entry = document.content.sections.find(section => section.kind === "summary")?.entries[0];
     const text = entry?.content && typeof entry.content === "object" && "text" in entry.content
       ? String(entry.content.text) : "";
-    setSummary(text);
+    if (lastSavedForm.current !== "summary") setSummary(text);
+    lastSavedForm.current = null;
   }, [document]);
 
   if (!document) {
@@ -61,6 +63,7 @@ export default function CVDocumentPage({ editingDependencies }: Props) {
     const result = updateCVPersonalDetails(activeDocument, details, editingDependencies);
     if (!result.ok) { setFieldErrors(result.fieldErrors); return; }
     setFieldErrors({});
+    lastSavedForm.current = "details";
     setActiveCV(result.document);
   }
   function saveSummary(event: FormEvent<HTMLFormElement>) {
@@ -68,6 +71,7 @@ export default function CVDocumentPage({ editingDependencies }: Props) {
     const result = updateCVSummary(activeDocument, summary, editingDependencies);
     if (!result.ok) { setSummaryError(result.message); return; }
     setSummaryError("");
+    lastSavedForm.current = "summary";
     setActiveCV(result.document);
   }
 
