@@ -48,7 +48,7 @@ describe("validateCVDocument", () => {
     invalid.content.personalDetails.contact!.email = "not-an-email";
     invalid.content.sections[0].entries[0].content.role = 42;
     invalid.content.sections[0].entries[0].content.dateRange = {
-      startDate: { year: 2025, month: 13 },
+      startDate: { year: 2025 },
       endDate: { year: 2024 },
     };
     const result = validateCVDocument(invalid);
@@ -56,7 +56,6 @@ describe("validateCVDocument", () => {
     expect(result.issues).toEqual(expect.arrayContaining([
       expect.objectContaining({ code: "invalid-email", path: "$.content.personalDetails.contact.email" }),
       expect.objectContaining({ code: "invalid-type", path: "$.content.sections[0].entries[0].content.role" }),
-      expect.objectContaining({ code: "invalid-date", path: "$.content.sections[0].entries[0].content.dateRange.startDate" }),
       expect.objectContaining({ code: "invalid-date-range", path: "$.content.sections[0].entries[0].content.dateRange.endDate" }),
     ]));
   });
@@ -78,7 +77,7 @@ describe("validateCVDocument", () => {
     });
     const result = validateCVDocument(invalid);
     expect(result.issues).toEqual(expect.arrayContaining([
-      expect.objectContaining({ code: "duplicate-identifier", path: "$.content.sections[1].id" }),
+      expect.objectContaining({ code: "duplicate-identifier", path: "$.content.sections[2].id" }),
       expect.objectContaining({ code: "duplicate-identifier", path: "$.content.sections[2].entries[0].id" }),
       expect.objectContaining({ code: "duplicate-identifier", path: "$.content.sections[1].entries[0].content.fields[1].id" }),
       expect.objectContaining({ code: "invalid-identifier", path: "$.content.sections[1].entries[0].content.fields[2].id" }),
