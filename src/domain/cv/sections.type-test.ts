@@ -18,10 +18,10 @@ const ongoingRange: CVDateRange = {
   startDate: yearOnly,
   ongoing: true,
 };
-const incompleteRange: CVDateRange = { startDate: yearOnly };
+export const incompleteRange: CVDateRange = { startDate: yearOnly };
 
 // @ts-expect-error An ongoing range cannot also have an end date.
-const invalidOngoingRange: CVDateRange = { endDate: fullDate, ongoing: true };
+export const invalidOngoingRange: CVDateRange = { endDate: fullDate, ongoing: true };
 
 const customFields: readonly CustomField[] = [
   { id: "field-1", key: "clearance", label: "Clearance", value: { type: "text", value: "Public" } },
@@ -35,14 +35,14 @@ const customFields: readonly CustomField[] = [
 ];
 
 // @ts-expect-error Unsupported custom field value types are rejected.
-const invalidCustomField: CustomField = { id: "field-invalid", key: "payload", label: "Payload", value: { type: "object", value: { arbitrary: true } } };
+export const invalidCustomField: CustomField = { id: "field-invalid", key: "payload", label: "Payload", value: { type: "object", value: { arbitrary: true } } };
 
 export const representativeSections = [
   { id: "summary-1", kind: "summary", entries: [{ id: "summary-entry-1", content: { text: "Product engineer." } }] },
   { id: "experience-1", kind: "experience", entries: [{ id: "experience-entry-1", content: { role: "Engineer", employer: "Example Ltd", dateRange: ongoingRange } }] },
   { id: "education-1", kind: "education", entries: [{ id: "education-entry-1", content: { institution: "Example University", qualification: "BSc", dateRange: completedRange } }] },
   { id: "skills-1", kind: "skills", entries: [{ id: "skill-entry-1", content: { name: "TypeScript", level: "advanced" } }] },
-  { id: "projects-1", kind: "projects", entries: [{ id: "project-entry-1", content: { name: "First Page", highlights: ["Structured CV data"] } }] },
+  { id: "projects-1", kind: "projects", entries: [{ id: "project-entry-1", content: { name: "First Page", dateRange: incompleteRange, highlights: ["Structured CV data"] } }] },
   { id: "languages-1", kind: "languages", entries: [{ id: "language-entry-1", content: { language: "English", proficiency: "C1" } }] },
   { id: "certifications-1", kind: "certifications", entries: [{ id: "cert-entry-1", content: { name: "Cloud Practitioner", issuedOn: monthAndYear } }] },
   { id: "awards-1", kind: "awards", entries: [{ id: "award-entry-1", content: { title: "Engineering Award", awardedOn: fullDate } }] },
