@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { createCVDocument } from "../../domain/cv/operations";
 import { getExperienceEntries, removeCVExperience, saveCVExperience } from "./updateCVExperience";
 
