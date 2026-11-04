@@ -185,7 +185,6 @@ export default function ExperienceEditor({ document, editingDependencies }: Prop
           onChange={event => updateDraft(fieldKey, event.target.value as never)}
           aria-invalid={Boolean(fieldErrors[errorKey])}
           aria-describedby={fieldErrors[errorKey] ? errorKey.replace(".", "-") : undefined} />
-        {fieldErrors[errorKey] && <span className="cv-field__error" id={errorKey.replace(".", "-")} role="alert">{fieldErrors[errorKey]}</span>}
       </label>
     );
   };
@@ -236,6 +235,8 @@ export default function ExperienceEditor({ document, editingDependencies }: Prop
                   {dateField("Month (optional)", "end", "Month", "MM")}
                   {dateField("Day (optional)", "end", "Day", "DD")}
                 </div>
+                {fieldErrors["dateRange.startDate"] && key === "start" && <p className="cv-field__error" id="dateRange-startDate" role="alert">{fieldErrors["dateRange.startDate"]}</p>}
+                {fieldErrors["dateRange.endDate"] && key === "end" && <p className="cv-field__error" id="dateRange-endDate" role="alert">{fieldErrors["dateRange.endDate"]}</p>}
               </div>
             </div>
             <label className="experience-ongoing"><input type="checkbox" checked={draft.ongoing} onChange={event => updateDraft("ongoing", event.target.checked)} /> I currently work here</label>
