@@ -79,4 +79,42 @@ describe("CVDocumentPage", () => {
     expect(getActiveCV()?.content.sections[0].entries[0].content).toEqual({ text: "Saved summary" });
   });
 
+
+  it("shows only committed details and summary in the live preview", () => {
+    setActiveCV(fixture());
+    render(<CVDocumentPage editingDependencies={dependencies} />);
+
+    expect(screen.getByRole("heading", { name: "Your CV will take shape here" })).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText("Given name"), { target: { value: "Draft Ada" } });
+    fireEvent.change(screen.getByLabelText("Summary"), { target: { value: "Draft summary" } });
+    expect(screen.getByRole("heading", { name: "Your CV will take shape here" })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Save personal details" }));
+    expect(screen.getByRole("heading", { name: "Draft Ada" })).toBeInTheDocument();
+    expect(screen.queryByText("Draft summary")).not.toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText("Summary"), { target: { value: "Committed summary" } });
+    expect(screen.queryByText("Committed summary")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Save summary" }));
+    expect(screen.getByText("Committed summary")).toBeInTheDocument();
+  });
+
+  it("removes cleared details from the preview after saving", () => {
+    setActiveCV({
+      ...fixture(),
+      content: { personalDetails: { name: { givenName: "Ada" }, contact: { email: "ada@example.com" } }, sections: [] },
+    });
+    render(<CVDocumentPage editingDependencies={dependencies} />);
+    expect(screen.getByRole("heading", { name: "Ada" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "ada@example.com" })).toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText("Given name"), { target: { value: "" } });
+    fireEvent.change(screen.getByLabelText("Email"), { target: { value: "" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save personal details" }));
+
+    expect(screen.queryByRole("heading", { name: "Ada" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "ada@example.com" })).not.toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Your CV will take shape here" })).toBeInTheDocument();
+  });
+
 });
