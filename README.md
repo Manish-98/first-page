@@ -25,7 +25,7 @@ Tests are colocated with the code they cover:
 - `*.test.tsx` for React component tests.
 - `*.type-test.ts` for compile-time TypeScript contract fixtures.
 
-The default Vitest environment is Node. Component tests can opt into jsdom with a file-level `@vitest-environment jsdom` annotation. Coverage is generated in `coverage/`; CI retains the report as a workflow artifact. Coverage thresholds are intentionally deferred until the project has a useful baseline.
+The default Vitest environment is Node. Component tests can opt into jsdom with a file-level `@vitest-environment jsdom` annotation. The shared test setup registers DOM matchers and cleans up React Testing Library renders after each test. Coverage is generated in `coverage/`; CI retains the report as a workflow artifact. Coverage thresholds are intentionally deferred until the project has a useful baseline.
 
 ## Contribution rule
 
