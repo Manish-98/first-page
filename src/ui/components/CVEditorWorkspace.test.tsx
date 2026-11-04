@@ -64,6 +64,7 @@ describe("CVEditorWorkspace", () => {
     renderWorkspace();
 
     const trigger = screen.getByRole("button", { name: "Show tools" });
+    trigger.focus();
     fireEvent.click(trigger);
 
     expect(screen.getByRole("dialog", { name: "Tools and sections" })).toBeInTheDocument();
