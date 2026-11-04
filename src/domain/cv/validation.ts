@@ -39,7 +39,7 @@ const builtInSectionKinds = [
   "references", "custom",
 ] as const satisfies readonly CVSectionKind[];
 
-const requiredEntryFields: { [K in CVSectionKind]: readonly string[] } = {
+const requiredEntryFields: { [K in keyof CVSectionContentMap]: readonly string[] } = {
   summary: ["text"],
   experience: ["role", "employer"],
   education: ["institution", "qualification"],
@@ -55,7 +55,7 @@ const requiredEntryFields: { [K in CVSectionKind]: readonly string[] } = {
   custom: ["fields"],
 };
 
-const stringEntryFields: { [K in CVSectionKind]: readonly string[] } = {
+const stringEntryFields: { [K in keyof CVSectionContentMap]: readonly string[] } = {
   summary: ["text"],
   experience: ["role", "employer", "location", "description"],
   education: ["institution", "qualification", "fieldOfStudy", "location", "grade", "description"],
@@ -87,8 +87,9 @@ function isValidCalendarDate(year: number, month: number, day: number): boolean 
   if (!Number.isInteger(year) || year < 1 || year > 9999 ||
       !Number.isInteger(month) || month < 1 || month > 12 ||
       !Number.isInteger(day) || day < 1) return false;
-  const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
-  return day <= daysInMonth;
+  const leapYear = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+  const daysByMonth = [31, leapYear ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  return day <= daysByMonth[month - 1];
 }
 
 function datePrecision(value: CVPartialDate): readonly [number, number, number] {
@@ -96,8 +97,8 @@ function datePrecision(value: CVPartialDate): readonly [number, number, number] 
 }
 
 function isValidPartialDate(value: unknown): value is CVPartialDate {
-  if (!isRecord(value) || !Number.isInteger(value.year) ||
-      typeof value.year !== "number" || value.year < 1 || value.year > 9999) return false;
+  if (!isRecord(value) || typeof value.year !== "number" || !Number.isInteger(value.year) ||
+      value.year < 1 || value.year > 9999) return false;
   if ("month" in value && (typeof value.month !== "number" || !Number.isInteger(value.month) || value.month < 1 || value.month > 12)) return false;
   if ("day" in value && (!("month" in value) || typeof value.day !== "number" || !Number.isInteger(value.day) ||
       !isValidCalendarDate(value.year, value.month as number, value.day))) return false;
