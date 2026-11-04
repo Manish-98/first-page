@@ -11,14 +11,13 @@ function sectionEntries<T>(section:CVSection):T[]{return section.entries.map(ent
 function range(value:{startDate?:CVPartialDate;endDate?:CVPartialDate;ongoing?:boolean}|undefined):string{return[dateText(value?.startDate),value?.ongoing?"Present":dateText(value?.endDate)].filter(Boolean).join(" – ");}
 function safeUrl(value:string):boolean{try{const url=new URL(value);return url.protocol==="http:"||url.protocol==="https:";}catch{return false;}}
 function renderCustomField(field:CustomField){
- const value=field.value.value;
  switch(field.value.type){
-  case "boolean":return value?"Yes":"No";
-  case "date":return dateText(value);
-  case "text-list":return value.length?<ul>{value.map((item,index)=><li key={index}>{item}</li>)}</ul>:null;
-  case "url":return safeUrl(value)?<a href={value} target="_blank" rel="noopener noreferrer">{value}</a>:value;
-  case "email":return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)?<a href={`mailto:${value}`}>{value}</a>:value;
-  default:return String(value);
+  case "boolean":return field.value.value?"Yes":"No";
+  case "date":return dateText(field.value.value);
+  case "text-list":return field.value.value.length?<ul>{field.value.value.map((item,index)=><li key={index}>{item}</li>)}</ul>:null;
+  case "url":return safeUrl(field.value.value)?<a href={field.value.value} target="_blank" rel="noopener noreferrer">{field.value.value}</a>:field.value.value;
+  case "email":return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(field.value.value)?<a href={`mailto:${field.value.value}`}>{field.value.value}</a>:field.value.value;
+  default:return String(field.value.value);
  }
 }
 function renderSection(document:CVDocument,section:CVSection){

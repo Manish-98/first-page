@@ -6,7 +6,6 @@ import { validateCVDocument } from "../../domain/cv/validation";
 import type { CVCreationDependencies } from "./createCV";
 
 export type CustomSectionResult = { ok: true; document: CVDocument } | { ok: false; fieldErrors: Readonly<Record<string,string>> };
-type FieldType = CustomFieldValue["type"];
 const customSection = (document: CVDocument, sectionId: string) => document.content.sections.find(section => section.id === sectionId && section.kind === "custom");
 function validate(document: CVDocument, fieldId?: string): Record<string,string> {
   const errors: Record<string,string> = {};
