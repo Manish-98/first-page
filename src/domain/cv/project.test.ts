@@ -194,7 +194,7 @@ describe("validateCVProject", () => {
             {
               id: "unsafe-extension",
               kind: "vendor.extension",
-              entries: [{ id: "unsafe-entry", content: { apiKey: "do-not-export" } }],
+              entries: [{ id: "unsafe-entry", content: { openAiApiKey: "do-not-export" } }],
             },
           ],
         },
@@ -205,7 +205,7 @@ describe("validateCVProject", () => {
         expect.objectContaining({
           code: "sensitive-data",
           category: "security",
-          path: "$.document.content.sections[3].entries[0].content.apiKey",
+          path: "$.document.content.sections[3].entries[0].content.openAiApiKey",
         }),
       ]),
     );
