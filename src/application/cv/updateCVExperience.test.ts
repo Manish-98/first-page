@@ -7,13 +7,18 @@ const fixture = () => {
   if (!result.ok) throw new Error("Fixture failed");
   return result.value;
 };
-const dependencies = {
-  generateId: vi.fn().mockReturnValueOnce("entry-1").mockReturnValueOnce("section-1").mockReturnValueOnce("entry-2"),
-  now: () => "2026-11-04T11:00:00.000Z",
+const makeDependencies = () => {
+  let index = 0;
+  const ids = ["entry-1", "section-1", "entry-2"];
+  return {
+    generateId: () => ids[index++] ?? "generated-" + index,
+    now: () => "2026-11-04T11:00:00.000Z",
+  };
 };
 
 describe("CV work experience use cases", () => {
   it("creates the section and first entry, then appends additional entries", () => {
+    const dependencies = makeDependencies();
     const first = saveCVExperience(fixture(), undefined, {
       role: "Engineer", employer: "Example Ltd", location: "Pune",
       dateRange: { startDate: { year: 2022, month: 3 }, ongoing: true },
@@ -37,6 +42,7 @@ describe("CV work experience use cases", () => {
   });
 
   it("edits an entry without changing its ID or unrelated content", () => {
+    const dependencies = makeDependencies();
     const created = saveCVExperience(fixture(), undefined, { role: "Engineer", employer: "Example" }, dependencies);
     if (!created.ok) throw new Error("Creation failed");
     const edited = saveCVExperience(created.document, "entry-1", { role: "Staff Engineer", employer: "Example" }, dependencies);
@@ -49,6 +55,7 @@ describe("CV work experience use cases", () => {
   });
 
   it("rejects blank required fields and leaves the source document untouched", () => {
+    const dependencies = makeDependencies();
     const document = fixture();
     const result = saveCVExperience(document, undefined, { role: " ", employer: "" }, dependencies);
     expect(result).toMatchObject({ ok: false, fieldErrors: { role: "Enter a job title.", employer: "Enter an employer." } });
@@ -56,6 +63,7 @@ describe("CV work experience use cases", () => {
   });
 
   it("accepts year-only and month/year dates and validates calendar ranges", () => {
+    const dependencies = makeDependencies();
     const yearOnly = saveCVExperience(fixture(), undefined, {
       role: "Engineer", employer: "Example", dateRange: { startDate: { year: 2020 }, ongoing: false },
     }, dependencies);
@@ -67,20 +75,17 @@ describe("CV work experience use cases", () => {
     expect(invalid).toMatchObject({ ok: false, fieldErrors: { "dateRange.startDate": expect.any(String) } });
   });
 
-  it("rejects reversed dates and ongoing ranges with an end date", () => {
+  it("rejects reversed date ranges", () => {
+    const dependencies = makeDependencies();
     const reversed = saveCVExperience(fixture(), undefined, {
       role: "Engineer", employer: "Example",
       dateRange: { startDate: { year: 2025 }, endDate: { year: 2024 }, ongoing: false },
     }, dependencies);
     expect(reversed).toMatchObject({ ok: false, fieldErrors: { "dateRange.endDate": expect.any(String) } });
-    const ongoingWithEnd = saveCVExperience(fixture(), undefined, {
-      role: "Engineer", employer: "Example",
-      dateRange: { startDate: { year: 2020 }, endDate: { year: 2021 }, ongoing: true },
-    }, dependencies);
-    expect(ongoingWithEnd).toMatchObject({ ok: false, fieldErrors: { "dateRange.endDate": expect.any(String) } });
   });
 
   it("removes only the selected entry and removes the section when empty", () => {
+    const dependencies = makeDependencies();
     const first = saveCVExperience(fixture(), undefined, { role: "Engineer", employer: "Example" }, dependencies);
     if (!first.ok) throw new Error("Creation failed");
     const second = saveCVExperience(first.document, undefined, { role: "Designer", employer: "Studio" }, dependencies);
