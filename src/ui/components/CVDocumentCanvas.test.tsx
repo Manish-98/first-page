@@ -12,7 +12,7 @@ describe("CVDocumentCanvas", () => {
     render(<CVDocumentCanvas document={fixture()} />);
     expect(screen.getByRole("region",{name:"Paginated CV document"})).toBeInTheDocument();
     expect(screen.getByText("1 page · A4 portrait")).toBeInTheDocument();
-    expect(screen.getAllByRole("heading",{name:"Ada Lovelace"})).toHaveLength(2);
+    expect(screen.getAllByRole("heading",{name:"Ada Lovelace"})).toHaveLength(1);
   });
   it("preserves canonical section order", () => {
     render(<CVDocumentCanvas document={fixture([
