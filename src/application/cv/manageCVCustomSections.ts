@@ -40,33 +40,35 @@ export function removeCustomCVSection(document: CVDocument, sectionId: string, d
   const result=removeSection(document,sectionId,dependencies.now());
   return result.ok ? {ok:true,document:result.value} : {ok:false,fieldErrors:{form:result.error.message}};
 }
-function entryId(section: CVSection): string | undefined { return section.entries[0]?.id; }
 function keyFromLabel(label: string, fields: readonly CustomField[]): string {
   const base=label.trim().toLowerCase().replace(/[^a-z0-9]+/g,"_").replace(/^_|_$/g,"") || "field";
   let key=base, suffix=2;
   while(fields.some(field=>field.key===key)) key=`${base}_${suffix++}`;
   return key;
 }
-export function addCVCustomField(document: CVDocument, sectionId: string, label: string, value: CustomFieldValue, dependencies: Pick<CVCreationDependencies,"generateId"|"now">): CustomSectionResult {
-  const section=customSection(document,sectionId), eid=section && entryId(section);
-  if (!section || !eid) return {ok:false,fieldErrors:{form:"Custom section is missing its field container."}};
+function fieldsForEntry(section: NonNullable<ReturnType<typeof customSection>>, entryId: string): readonly CustomField[] | undefined {
+  const entry=section.entries.find(item=>item.id===entryId);
+  return entry ? (entry.content as {fields:readonly CustomField[]}).fields : undefined;
+}
+export function addCVCustomField(document: CVDocument, sectionId: string, entryId: string, label: string, value: CustomFieldValue, dependencies: Pick<CVCreationDependencies,"generateId"|"now">): CustomSectionResult {
+  const section=customSection(document,sectionId), fields=section && fieldsForEntry(section,entryId);
+  if (!section || !fields) return {ok:false,fieldErrors:{form:"Custom section entry could not be found."}};
   if (!label.trim()) return {ok:false,fieldErrors:{label:"Enter a field label."}};
   if (!["text","number","boolean","date","url","email","phone","text-list"].includes(value.type)) return {ok:false,fieldErrors:{type:"Choose a supported field type."}};
-  const fields=(section.entries[0].content as {fields:readonly CustomField[]}).fields;
   const field: CustomField={id:dependencies.generateId(),key:keyFromLabel(label,fields),label:label.trim(),value};
-  const result=addCustomField(document,sectionId,eid,field,dependencies.now());
+  const result=addCustomField(document,sectionId,entryId,field,dependencies.now());
   return result.ok ? validated(result.value,field.id) : {ok:false,fieldErrors:{form:result.error.message}};
 }
-export function updateCVCustomField(document: CVDocument, sectionId: string, fieldId: string, updates: {label?:string;value?:CustomFieldValue}, dependencies: Pick<CVCreationDependencies,"now">): CustomSectionResult {
-  const section=customSection(document,sectionId),eid=section && entryId(section);
-  if (!section || !eid) return {ok:false,fieldErrors:{form:"Custom section or field container could not be found."}};
+export function updateCVCustomField(document: CVDocument, sectionId: string, entryId: string, fieldId: string, updates: {label?:string;value?:CustomFieldValue}, dependencies: Pick<CVCreationDependencies,"now">): CustomSectionResult {
+  const section=customSection(document,sectionId);
+  if (!section || !fieldsForEntry(section,entryId)) return {ok:false,fieldErrors:{form:"Custom section entry could not be found."}};
   if (updates.label !== undefined && !updates.label.trim()) return {ok:false,fieldErrors:{label:"Enter a field label."}};
-  const result=updateCustomField(document,sectionId,eid,fieldId,{...updates,label:updates.label?.trim()},dependencies.now());
+  const result=updateCustomField(document,sectionId,entryId,fieldId,{...updates,label:updates.label?.trim()},dependencies.now());
   return result.ok ? validated(result.value,fieldId) : {ok:false,fieldErrors:{form:result.error.message}};
 }
-export function removeCVCustomField(document: CVDocument, sectionId: string, fieldId: string, dependencies: Pick<CVCreationDependencies,"now">): CustomSectionResult {
-  const section=customSection(document,sectionId),eid=section && entryId(section);
-  if (!section || !eid) return {ok:false,fieldErrors:{form:"Custom section or field container could not be found."}};
-  const result=removeCustomField(document,sectionId,eid,fieldId,dependencies.now());
+export function removeCVCustomField(document: CVDocument, sectionId: string, entryId: string, fieldId: string, dependencies: Pick<CVCreationDependencies,"now">): CustomSectionResult {
+  const section=customSection(document,sectionId);
+  if (!section || !fieldsForEntry(section,entryId)) return {ok:false,fieldErrors:{form:"Custom section entry could not be found."}};
+  const result=removeCustomField(document,sectionId,entryId,fieldId,dependencies.now());
   return result.ok ? {ok:true,document:result.value} : {ok:false,fieldErrors:{form:result.error.message}};
 }

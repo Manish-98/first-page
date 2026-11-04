@@ -26,20 +26,22 @@ function parseValue(type:FieldType,raw:string):CustomFieldValue|undefined {
 }
 export default function CustomSectionsEditor({document,editingDependencies,onDocumentChange}:Props) {
  const [newTitle,setNewTitle]=useState(""); const [editingTitle,setEditingTitle]=useState<Record<string,string>>({});
- const [activeSection,setActiveSection]=useState(""); const [editingField,setEditingField]=useState<string|undefined>();
+ const [activeSection,setActiveSection]=useState(""); const [activeEntry,setActiveEntry]=useState("");
+ const [editingField,setEditingField]=useState<string|undefined>();
  const [label,setLabel]=useState(""); const [type,setType]=useState<FieldType>("text"); const [raw,setRaw]=useState("");
  const [error,setError]=useState(""); const [fieldErrors,setFieldErrors]=useState<Record<string,string>>({});
  const sections=document.content.sections.filter(section=>section.kind==="custom");
  function resetField(){setEditingField(undefined);setLabel("");setType("text");setRaw("");setError("");setFieldErrors({});}
  function createSection(event:FormEvent){event.preventDefault();const result=createCustomCVSection(document,newTitle,editingDependencies);if(!result.ok){setFieldErrors(result.fieldErrors);return;}setNewTitle("");setFieldErrors({});onDocumentChange(result.document);}
  function rename(sectionId:string){const result=renameCustomCVSection(document,sectionId,editingTitle[sectionId]??"",editingDependencies);if(!result.ok){setError(result.fieldErrors.title??result.fieldErrors.form??"Unable to rename section.");return;}setError("");onDocumentChange(result.document);}
- function removeSection(sectionId:string){const result=removeCustomCVSection(document,sectionId,editingDependencies);if(!result.ok){setError(result.fieldErrors.form??"Unable to remove section.");return;}if(activeSection===sectionId){setActiveSection("");resetField();}onDocumentChange(result.document);}
- function startEdit(sectionId:string,field:CustomField){setActiveSection(sectionId);setEditingField(field.id);setLabel(field.label);setType(field.value.type);setRaw(fieldValue(field));setFieldErrors({});setError("");}
+ function removeSection(sectionId:string){const result=removeCustomCVSection(document,sectionId,editingDependencies);if(!result.ok){setError(result.fieldErrors.form??"Unable to remove section.");return;}if(activeSection===sectionId){setActiveSection("");setActiveEntry("");resetField();}onDocumentChange(result.document);}
+ function startAdd(sectionId:string,entryId:string){setActiveSection(sectionId);setActiveEntry(entryId);resetField();}
+ function startEdit(sectionId:string,entryId:string,field:CustomField){setActiveSection(sectionId);setActiveEntry(entryId);setEditingField(field.id);setLabel(field.label);setType(field.value.type);setRaw(fieldValue(field));setFieldErrors({});setError("");}
  function saveField(event:FormEvent){event.preventDefault();const value=parseValue(type,raw);if(!value){setFieldErrors({value:type==="number"?"Enter a finite number.":type==="date"?"Use YYYY, YYYY-MM or YYYY-MM-DD.":"Enter a value."});return;}
-  const result=editingField?updateCVCustomField(document,activeSection,editingField,{label,value},editingDependencies):addCVCustomField(document,activeSection,label,value,editingDependencies);
+  const result=editingField?updateCVCustomField(document,activeSection,activeEntry,editingField,{label,value},editingDependencies):addCVCustomField(document,activeSection,activeEntry,label,value,editingDependencies);
   if(!result.ok){setFieldErrors(result.fieldErrors);setError(result.fieldErrors.form??"Check the field value.");return;}onDocumentChange(result.document);resetField();
  }
- function removeField(sectionId:string,fieldId:string){const result=removeCVCustomField(document,sectionId,fieldId,editingDependencies);if(!result.ok){setError(result.fieldErrors.form??"Unable to remove field.");return;}onDocumentChange(result.document);if(editingField===fieldId)resetField();}
+ function removeField(sectionId:string,entryId:string,fieldId:string){const result=removeCVCustomField(document,sectionId,entryId,fieldId,editingDependencies);if(!result.ok){setError(result.fieldErrors.form??"Unable to remove field.");return;}onDocumentChange(result.document);if(editingField===fieldId)resetField();}
  return <section className="cv-editor__section custom-sections-editor" aria-labelledby="custom-sections-title">
   <h2 id="custom-sections-title">Custom sections</h2>
   <p className="field-hint">Add your own sections and factual fields. Custom sections appear in the preview in the same order as the other CV sections.</p>
@@ -48,28 +50,33 @@ export default function CustomSectionsEditor({document,editingDependencies,onDoc
    <button className="button button--secondary" type="submit">Create custom section</button>
   </form>
   {sections.map(section=>{
-   const fields=(section.entries[0]?.content as {fields:readonly CustomField[]}|undefined)?.fields??[];
    const title=section.title??"Custom section";
    return <div className="custom-section" key={section.id}>
     <div className="experience-section__heading">
      <div className="custom-section__title"><h3>{title}</h3><label className="cv-field"><span>Section name</span><input aria-label={`Rename ${title}`} value={editingTitle[section.id]??title} onChange={event=>setEditingTitle(current=>({...current,[section.id]:event.target.value}))}/></label></div>
      <div className="experience-entry__actions"><button className="text-button" type="button" onClick={()=>rename(section.id)}>Save name</button><button className="text-button" type="button" onClick={()=>removeSection(section.id)}>Remove section</button></div>
     </div>
-    {fields.length?<ul className="experience-entry-list">{fields.map(field=><li className="experience-entry" key={field.id}><div className="experience-entry__content"><strong>{field.label}</strong><p className="field-hint">{field.value.type}</p></div><div className="experience-entry__actions"><button className="text-button" type="button" onClick={()=>startEdit(section.id,field)}>Edit</button><button className="text-button" type="button" onClick={()=>removeField(section.id,field.id)}>Remove</button></div></li>)}</ul>:<p className="field-hint">No fields yet.</p>}
-    {activeSection===section.id&&<form className="experience-form" onSubmit={saveField} noValidate>
-     <h4>{editingField?"Edit field":"Add field"}</h4>
-     <div className="cv-editor__grid">
-      <label className="cv-field"><span>Field label</span><input value={label} onChange={event=>setLabel(event.target.value)} aria-invalid={Boolean(fieldErrors.label)}/>{fieldErrors.label&&<span role="alert" className="cv-field__error">{fieldErrors.label}</span>}</label>
-      <label className="cv-field"><span>Field type</span><select value={type} disabled={Boolean(editingField)} onChange={event=>{setType(event.target.value as FieldType);setRaw("");}}>{types.map(item=><option key={item} value={item}>{item}</option>)}</select></label>
-      {type==="boolean"?<label className="experience-ongoing"><input type="checkbox" checked={raw==="true"} onChange={event=>setRaw(String(event.target.checked))}/> True</label>:
-       <label className="cv-field"><span>{type==="date"?"Value (YYYY, YYYY-MM or YYYY-MM-DD)":type==="text-list"?"Values (one per line)":"Value"}</span>{type==="text-list"?<textarea rows={3} value={raw} onChange={event=>setRaw(event.target.value)}/>:<input type={type==="url"?"url":type==="email"?"email":type==="number"?"number":type==="phone"?"tel":"text"} value={raw} onChange={event=>setRaw(event.target.value)} aria-invalid={Boolean(fieldErrors.value)}/>}{fieldErrors.value&&<span role="alert" className="cv-field__error">{fieldErrors.value}</span>}</label>}
-     </div>
-     {error&&<p role="alert" className="cv-field__error">{error}</p>}
-     <div className="experience-form__actions"><button className="button button--primary" type="submit">{editingField?"Save field":"Add field"}</button><button className="button button--secondary" type="button" onClick={resetField}>Cancel</button></div>
-    </form>}
-    {activeSection!==section.id&&<button className="button button--secondary" type="button" onClick={()=>{setActiveSection(section.id);resetField();}}>Add field</button>}
+    {section.entries.map(entry=>{
+     const fields=(entry.content as {fields:readonly CustomField[]}).fields;
+     return <div className="custom-section__entry" key={entry.id} aria-label={`Entry ${entry.id}`}>
+      <h4>Fields</h4>
+      {fields.length?<ul className="experience-entry-list">{fields.map(field=><li className="experience-entry" key={field.id}><div className="experience-entry__content"><strong>{field.label}</strong><p className="field-hint">{field.value.type}</p></div><div className="experience-entry__actions"><button className="text-button" type="button" onClick={()=>startEdit(section.id,entry.id,field)}>Edit</button><button className="text-button" type="button" onClick={()=>removeField(section.id,entry.id,field.id)}>Remove</button></div></li>)}</ul>:<p className="field-hint">No fields in this entry yet.</p>}
+      {activeSection===section.id&&activeEntry===entry.id&&<form className="experience-form" onSubmit={saveField} noValidate>
+       <h4>{editingField?"Edit field":"Add field"}</h4>
+       <div className="cv-editor__grid">
+        <label className="cv-field"><span>Field label</span><input value={label} onChange={event=>setLabel(event.target.value)} aria-invalid={Boolean(fieldErrors.label)}/>{fieldErrors.label&&<span role="alert" className="cv-field__error">{fieldErrors.label}</span>}</label>
+        <label className="cv-field"><span>Field type</span><select value={type} disabled={Boolean(editingField)} onChange={event=>{setType(event.target.value as FieldType);setRaw("");}}>{types.map(item=><option key={item} value={item}>{item}</option>)}</select></label>
+        {type==="boolean"?<label className="experience-ongoing"><input type="checkbox" checked={raw==="true"} onChange={event=>setRaw(String(event.target.checked))}/> True</label>:
+         <label className="cv-field"><span>{type==="date"?"Value (YYYY, YYYY-MM or YYYY-MM-DD)":type==="text-list"?"Values (one per line)":"Value"}</span>{type==="text-list"?<textarea rows={3} value={raw} onChange={event=>setRaw(event.target.value)}/>:<input type={type==="url"?"url":type==="email"?"email":type==="number"?"number":type==="phone"?"tel":"text"} value={raw} onChange={event=>setRaw(event.target.value)} aria-invalid={Boolean(fieldErrors.value)}/>}{fieldErrors.value&&<span role="alert" className="cv-field__error">{fieldErrors.value}</span>}</label>}
+       </div>
+       {error&&<p role="alert" className="cv-field__error">{error}</p>}
+       <div className="experience-form__actions"><button className="button button--primary" type="submit">{editingField?"Save field":"Add field"}</button><button className="button button--secondary" type="button" onClick={resetField}>Cancel</button></div>
+      </form>}
+      {!(activeSection===section.id&&activeEntry===entry.id)&&<button className="button button--secondary" type="button" onClick={()=>startAdd(section.id,entry.id)}>Add field</button>}
+     </div>;
+    })}
+    {error&&!activeSection&&<p role="alert" className="cv-field__error">{error}</p>}
    </div>;
   })}
-  {error&&!activeSection&&<p role="alert" className="cv-field__error">{error}</p>}
  </section>;
 }

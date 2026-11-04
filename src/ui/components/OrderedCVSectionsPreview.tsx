@@ -30,9 +30,10 @@ function renderSection(document:CVDocument,section:CVSection){
   case "projects":case "languages":case "certifications":case "awards":case "volunteering":case "publications":case "interests":case "references":
    return <AdditionalSectionsPreview document={document} kind={section.kind as AdditionalStandardSectionKind} key={section.id}/>;
   case "custom":{
-   const item=sectionEntries<CustomSectionContent>(section)[0];if(!item)return null;
-   const fields=item.fields.filter(field=>field.label.trim());
-   return fields.length||item.description?.trim()?<section className="cv-preview__section" aria-labelledby={id} key={section.id}><h4 id={id}>{section.title||"Additional information"}</h4>{item.description&&<p className="cv-preview__summary">{item.description}</p>}<dl className="cv-preview__custom-fields">{fields.map(field=><div key={field.id}><dt>{field.label}</dt><dd>{renderCustomField(field)}</dd></div>)}</dl></section>:null;
+   const items=sectionEntries<CustomSectionContent>(section);
+   const descriptions=items.map(item=>item.description?.trim()).filter((value):value is string=>Boolean(value));
+   const fields=items.flatMap(item=>item.fields).filter(field=>field.label.trim());
+   return fields.length||descriptions.length?<section className="cv-preview__section" aria-labelledby={id} key={section.id}><h4 id={id}>{section.title||"Additional information"}</h4>{descriptions.map((description,index)=><p className="cv-preview__summary" key={index}>{description}</p>)}<dl className="cv-preview__custom-fields">{fields.map(field=><div key={field.id}><dt>{field.label}</dt><dd>{renderCustomField(field)}</dd></div>)}</dl></section>:null;
   }
   default:return null;
  }
