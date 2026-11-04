@@ -26,7 +26,10 @@ function fromContent(content: EducationSectionContent): Draft {
   return toDraftDate(content.dateRange?.ongoing ? undefined : content.dateRange?.endDate, "end", draft);
 }
 function parseDate(draft: Draft, prefix: "start" | "end", errors: Record<string,string>): CVPartialDate | undefined {
-  const year=draft[prefix+"Year"].trim(), month=draft[prefix+"Month"].trim(), day=draft[prefix+"Day"].trim();
+  const yearKey = prefix === "start" ? "startYear" : "endYear";
+  const monthKey = prefix === "start" ? "startMonth" : "endMonth";
+  const dayKey = prefix === "start" ? "startDay" : "endDay";
+  const year=draft[yearKey].trim(), month=draft[monthKey].trim(), day=draft[dayKey].trim();
   if(!year&&!month&&!day)return undefined;
   if(!year){errors["dateRange."+prefix+"Date"]="Enter a year when providing a month or day.";return undefined;}
   if(day&&!month){errors["dateRange."+prefix+"Date"]="Enter a month when providing a day.";return undefined;}
