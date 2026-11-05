@@ -218,7 +218,7 @@ export default function CVDocumentPage({ editingDependencies }: Props) {
             const sectionIndex = activeDocument.content.sections.findIndex(section => section.id === selection.sectionId);
             const selectedSection = activeDocument.content.sections[sectionIndex];
             return selectedSection ? (
-              <section className="editor-selection-details" aria-live="polite">
+              <section className="editor-selection-details" aria-label="Selection details" aria-live="polite">
                 <p className="eyebrow">SELECTED ELEMENT</p>
                 <h3>{getSectionLabel(selectedSection)}</h3>
                 <p>CV section</p>
