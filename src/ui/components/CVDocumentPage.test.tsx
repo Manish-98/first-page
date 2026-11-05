@@ -129,6 +129,47 @@ describe("CVDocumentPage", () => {
     expect(getActiveCV()?.content.sections.some(section => section.kind === "summary")).toBe(false);
   });
 
+  it("shows contextual metadata when a CV section is selected", () => {
+    setActiveCV({
+      ...fixture(),
+      content: {
+        personalDetails: {},
+        sections: [{
+          id: "summary-section",
+          kind: "summary",
+          title: "Professional Summary",
+          entries: [{ id: "summary-entry", content: { text: "A concise profile" } }],
+        }],
+      },
+    });
+    render(<CVDocumentPage editingDependencies={dependencies} />);
+    const target = screen.getByRole("group", { name: "Select Professional Summary section" });
+    fireEvent.keyDown(target, { key: "Enter" });
+    expect(screen.getByRole("heading", { name: "Professional Summary" })).toBeInTheDocument();
+    expect(screen.getByText("summary")).toBeInTheDocument();
+    expect(screen.getByText("1 of 1")).toBeInTheDocument();
+  });
+
+  it("clears selection when the selected section is removed", () => {
+    setActiveCV({
+      ...fixture(),
+      content: {
+        personalDetails: {},
+        sections: [{
+          id: "summary-section",
+          kind: "summary",
+          title: "Professional Summary",
+          entries: [{ id: "summary-entry", content: { text: "A concise profile" } }],
+        }],
+      },
+    });
+    render(<CVDocumentPage editingDependencies={dependencies} />);
+    fireEvent.keyDown(screen.getByRole("group", { name: "Select Professional Summary section" }), { key: "Enter" });
+    expect(screen.getByText("summary")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Remove Professional Summary section" }));
+    expect(screen.getByRole("heading", { name: "Nothing selected" })).toBeInTheDocument();
+  });
+
   it("shows only committed details and summary in the live preview", () => {
     setActiveCV(fixture());
     render(<CVDocumentPage editingDependencies={dependencies} />);
