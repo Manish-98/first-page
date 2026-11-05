@@ -91,7 +91,7 @@ export default function CVDocumentCanvas({ document, selection = null, onSelecti
         </div>
       </div>
       <div className="cv-document-canvas__accessible-content" aria-label="CV content for assistive technology"
-        onClick={handleCanvasClick}>
+        onClick={handleCanvasClick} onKeyDown={handleAccessibleKeyDown}>
         <CVPreview document={document} selectedKey={selectedKey} accessibleSelection />
       </div>
       <div className="cv-document-canvas__measure" ref={measureRef} aria-hidden="true" inert>
