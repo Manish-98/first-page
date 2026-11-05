@@ -87,3 +87,23 @@
   white-space: nowrap;
   border: 0;
 }
+
+/* Selection is a transient editor state; it never changes the CV preview content. */
+.cv-document-canvas [data-cv-selection-key] { cursor: pointer; }
+.cv-document-canvas [data-cv-selection-key][data-cv-selected="true"] {
+  outline: 2px solid var(--color-accent, #8a7048);
+  outline-offset: 3px;
+  border-radius: 2px;
+  background-color: rgb(138 112 72 / 7%);
+}
+.cv-document-canvas__accessible-content [data-cv-selection-key] { cursor: pointer; }
+.cv-document-canvas__accessible-content [data-cv-selection-key]:focus-visible {
+  outline: 2px solid var(--color-accent, #8a7048);
+  outline-offset: 3px;
+}
+.editor-selection-details h3 { margin: 0 0 6px; font-size: 1.15rem; }
+.editor-selection-details > p:not(.eyebrow) { color: var(--color-subtle); font-size: .86rem; }
+.editor-selection-details dl { display: grid; gap: 12px; margin: 20px 0 0; }
+.editor-selection-details dl > div { display: grid; gap: 3px; }
+.editor-selection-details dt { color: var(--color-subtle); font-size: .7rem; letter-spacing: .08em; text-transform: uppercase; }
+.editor-selection-details dd { margin: 0; overflow-wrap: anywhere; font-size: .9rem; }
