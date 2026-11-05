@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import type { CVDocument } from "../../domain/cv/types";
 import CVDocumentCanvas from "./CVDocumentCanvas";
