@@ -1,0 +1,89 @@
+.cv-document-canvas { min-width: 0; color: var(--color-ink); }
+.cv-document-canvas__heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 0 0 14px; }
+.cv-document-canvas__heading h2 { margin: 0; font-family: var(--font-display); font-size: 1.55rem; font-weight: 400; }
+.cv-document-canvas__heading span { color: var(--color-subtle); font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; }
+.cv-document-canvas__viewport { overflow: auto; padding: 4px 4px 24px; }
+.cv-document-canvas__pages { display: flex; flex-direction: column; align-items: center; gap: 24px; }
+.cv-document-canvas__page {
+  box-sizing: border-box;
+  position: relative;
+  flex: 0 0 auto;
+  width: var(--cv-page-width);
+  height: var(--cv-page-height);
+  overflow: hidden;
+  background: #fffefa;
+  box-shadow: 0 8px 28px rgb(36 37 31 / 12%);
+}
+.cv-document-canvas__page-content {
+  position: absolute;
+  top: var(--cv-page-margin);
+  left: var(--cv-page-margin);
+  width: var(--cv-content-width);
+  height: var(--cv-content-height);
+  overflow: hidden;
+}
+.cv-document-canvas__page-flow {
+  position: absolute;
+  left: 0;
+  width: 100%;
+}
+.cv-document-canvas__page-flow .cv-preview-panel,
+.cv-document-canvas__measure .cv-preview-panel {
+  position: static;
+  width: 100%;
+  max-width: none;
+}
+.cv-document-canvas__page-flow .cv-preview-panel__topline,
+.cv-document-canvas__measure .cv-preview-panel__topline,
+.cv-document-canvas__accessible-content .cv-preview-panel__topline { display: none; }
+.cv-document-canvas__page-flow .cv-preview {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+  font-size: 10pt;
+  line-height: 1.4;
+  transform: none;
+}
+.cv-document-canvas__page-flow .cv-preview__section { break-inside: auto; }
+.cv-document-canvas__page-flow .cv-preview__section h4,
+.cv-document-canvas__page-flow .cv-preview__experience h5,
+.cv-document-canvas__page-flow .cv-preview__education h5 { break-after: avoid; }
+.cv-document-canvas__measure {
+  position: absolute;
+  top: 0;
+  left: -100000px;
+  width: var(--cv-content-width);
+  visibility: hidden;
+  pointer-events: none;
+}
+.cv-document-canvas__measure .cv-preview {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  font-size: 10pt;
+  line-height: 1.4;
+}
+.cv-document-canvas__accessible-content {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

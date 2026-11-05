@@ -7,7 +7,7 @@ import { setActiveCV } from "../../application/cv/cvSession";
 import { useActiveCV } from "../hooks/useActiveCV";
 import AppLink from "./AppLink";
 import ContentSection from "./ContentSection";
-import CVPreview from "./CVPreview";
+import CVDocumentCanvas from "./CVDocumentCanvas";
 import ExperienceEditor from "./ExperienceEditor";
 import EducationEditor from "./EducationEditor";
 import SkillsEditor from "./SkillsEditor";
@@ -184,13 +184,7 @@ export default function CVDocumentPage({ editingDependencies }: Props) {
           </div>
         )}
       >
-        <div className="cv-editor-canvas">
-          <div className="cv-preview-panel__topline">
-            <h2>Document</h2>
-            <span>Read-only canvas</span>
-          </div>
-          <CVPreview document={activeDocument} />
-        </div>
+        <CVDocumentCanvas document={activeDocument} />
       </CVEditorWorkspace>
     </div>
   );
