@@ -143,7 +143,7 @@ describe("CVDocumentPage", () => {
       },
     });
     render(<CVDocumentPage editingDependencies={dependencies} />);
-    const target = screen.getByRole("group", { name: "Select Professional Summary section" });
+    const target = screen.getByRole("group", { name: "Professional Summary" });
     fireEvent.keyDown(target, { key: "Enter" });
     expect(screen.getAllByRole("heading", { name: "Professional Summary" })).toHaveLength(2);
     expect(screen.getByText("summary")).toBeInTheDocument();
@@ -164,7 +164,7 @@ describe("CVDocumentPage", () => {
       },
     });
     render(<CVDocumentPage editingDependencies={dependencies} />);
-    fireEvent.keyDown(screen.getByRole("group", { name: "Select Professional Summary section" }), { key: "Enter" });
+    fireEvent.keyDown(screen.getByRole("group", { name: "Professional Summary" }), { key: "Enter" });
     expect(screen.getByText("summary")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Remove Professional Summary section" }));
     expect(screen.getByRole("heading", { name: "Nothing selected" })).toBeInTheDocument();
