@@ -145,7 +145,7 @@ describe("CVDocumentPage", () => {
     render(<CVDocumentPage editingDependencies={dependencies} />);
     const target = screen.getByRole("group", { name: "Select Professional Summary section" });
     fireEvent.keyDown(target, { key: "Enter" });
-    expect(screen.getByRole("heading", { name: "Professional Summary" })).toBeInTheDocument();
+    expect(screen.getAllByRole("heading", { name: "Professional Summary" })).toHaveLength(2);
     expect(screen.getByText("summary")).toBeInTheDocument();
     expect(screen.getByText("1 of 1")).toBeInTheDocument();
   });
