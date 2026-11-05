@@ -204,7 +204,7 @@ export default function CVDocumentPage({ editingDependencies }: Props) {
               <p>Select a section or personal details on the document to inspect it here.</p>
             </div>
           ) : selection.type === "personal-details" ? (
-            <section className="editor-selection-details" aria-live="polite">
+            <section className="editor-selection-details" aria-label="Selection details" aria-live="polite">
               <p className="eyebrow">SELECTED ELEMENT</p>
               <h3>Personal details</h3>
               <p>Document identity and contact information</p>
