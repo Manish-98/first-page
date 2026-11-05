@@ -56,7 +56,7 @@ describe("CVDocumentCanvas", () => {
     ]);
     const onSelectionChange = vi.fn();
     render(<CVDocumentCanvas document={cvDocument} onSelectionChange={onSelectionChange} />);
-    const target = screen.getByRole("group", { name: "Select summary section" });
+    const target = screen.getByRole("group", { name: "Professional Summary" });
     fireEvent.keyDown(target, { key: "Enter" });
     expect(onSelectionChange).toHaveBeenCalledWith({ type: "section", sectionId: "summary" });
     fireEvent.keyDown(target, { key: "Escape" });
