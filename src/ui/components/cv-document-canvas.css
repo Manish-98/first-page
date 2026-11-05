@@ -107,3 +107,19 @@
 .editor-selection-details dl > div { display: grid; gap: 3px; }
 .editor-selection-details dt { color: var(--color-subtle); font-size: .7rem; letter-spacing: .08em; text-transform: uppercase; }
 .editor-selection-details dd { margin: 0; overflow-wrap: anywhere; font-size: .9rem; }
+
+.cv-document-canvas__accessible-content:focus-within {
+  z-index: 5;
+  position: absolute;
+  width: min(560px, calc(100% - 32px));
+  height: min(70vh, 720px);
+  padding: 18px;
+  margin: 0;
+  overflow: auto;
+  clip: auto;
+  white-space: normal;
+  border: 1px solid var(--color-border, #d8d3c8);
+  border-radius: 8px;
+  background: #fffefa;
+  box-shadow: 0 12px 36px rgb(36 37 31 / 18%);
+}
