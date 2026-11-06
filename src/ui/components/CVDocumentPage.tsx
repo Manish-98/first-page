@@ -16,6 +16,8 @@ import CVSectionManager from "./CVSectionManager";
 import CustomSectionsEditor from "./CustomSectionsEditor";
 import CVEditorHeader from "./CVEditorHeader";
 import CVEditorWorkspace from "./CVEditorWorkspace";
+import type { CVSelection } from "./cvSelection";
+import { getSectionLabel } from "./cvSelection";
 
 interface Props { editingDependencies: CVCreationDependencies }
 const emptyDetails: PersonalDetails = {};
@@ -26,12 +28,30 @@ export default function CVDocumentPage({ editingDependencies }: Props) {
   const [summary, setSummary] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [summaryError, setSummaryError] = useState("");
+  const [selection, setSelection] = useState<CVSelection>(null);
+  const previousDocumentId = useRef<string | null>(null);
   const lastSavedForm = useRef<"details" | "summary" | "section" | null>(null);
 
   useEffect(() => {
     window.document.body.classList.add("cv-editor-active");
     return () => window.document.body.classList.remove("cv-editor-active");
   }, []);
+
+  useEffect(() => {
+    if (!document) {
+      setSelection(null);
+      previousDocumentId.current = null;
+      return;
+    }
+    if (previousDocumentId.current !== document.id) {
+      previousDocumentId.current = document.id;
+      setSelection(null);
+      return;
+    }
+    if (selection?.type === "section" && !document.content.sections.some(section => section.id === selection.sectionId)) {
+      setSelection(null);
+    }
+  }, [document, selection]);
 
   useEffect(() => {
     if (!document) return;
@@ -177,14 +197,42 @@ export default function CVDocumentPage({ editingDependencies }: Props) {
           </div>
         )}
         rightPanel={(
-          <div className="editor-properties-empty">
-            <span className="editor-properties-empty__mark" aria-hidden="true">✦</span>
-            <h3>Nothing selected</h3>
-            <p>Selecting and editing individual elements on the document canvas will be available in a later editor story.</p>
-          </div>
+          selection === null ? (
+            <div className="editor-properties-empty">
+              <span className="editor-properties-empty__mark" aria-hidden="true">✦</span>
+              <h3>Nothing selected</h3>
+              <p>Select a section or personal details on the document to inspect it here.</p>
+            </div>
+          ) : selection.type === "personal-details" ? (
+            <section className="editor-selection-details" aria-label="Selection details" aria-live="polite">
+              <p className="eyebrow">SELECTED ELEMENT</p>
+              <h3>Personal details</h3>
+              <p>Document identity and contact information</p>
+              <dl>
+                <div><dt>Name</dt><dd>{[activeDocument.content.personalDetails.name?.givenName, activeDocument.content.personalDetails.name?.familyName].filter(Boolean).join(" ") || "Not provided"}</dd></div>
+                <div><dt>Headline</dt><dd>{activeDocument.content.personalDetails.headline || "Not provided"}</dd></div>
+                <div><dt>Contact fields</dt><dd>{[activeDocument.content.personalDetails.contact?.email, activeDocument.content.personalDetails.contact?.phone, activeDocument.content.personalDetails.contact?.website].filter(Boolean).length}</dd></div>
+              </dl>
+            </section>
+          ) : (() => {
+            const sectionIndex = activeDocument.content.sections.findIndex(section => section.id === selection.sectionId);
+            const selectedSection = activeDocument.content.sections[sectionIndex];
+            return selectedSection ? (
+              <section className="editor-selection-details" aria-label="Selection details" aria-live="polite">
+                <p className="eyebrow">SELECTED ELEMENT</p>
+                <h3>{getSectionLabel(selectedSection)}</h3>
+                <p>CV section</p>
+                <dl>
+                  <div><dt>Type</dt><dd>{selectedSection.kind}</dd></div>
+                  <div><dt>Entries</dt><dd>{selectedSection.entries.length}</dd></div>
+                  <div><dt>Position</dt><dd>{sectionIndex + 1} of {activeDocument.content.sections.length}</dd></div>
+                </dl>
+              </section>
+            ) : null;
+          })()
         )}
       >
-        <CVDocumentCanvas document={activeDocument} />
+        <CVDocumentCanvas document={activeDocument} selection={selection} onSelectionChange={setSelection} />
       </CVEditorWorkspace>
     </div>
   );

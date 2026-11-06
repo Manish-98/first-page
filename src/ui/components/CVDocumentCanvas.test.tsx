@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import type { CVDocument } from "../../domain/cv/types";
 import CVDocumentCanvas from "./CVDocumentCanvas";
@@ -35,6 +35,41 @@ describe("CVDocumentCanvas", () => {
     const summaryIndex = renderedText.indexOf("Professional Summary");
     expect(skillsIndex).toBeGreaterThanOrEqual(0);
     expect(summaryIndex).toBeGreaterThan(skillsIndex);
+  });
+
+  it("selects a section from the visual canvas without mutating CV content", () => {
+    const cvDocument = fixture([
+      { id: "summary", kind: "summary", entries: [{ id: "summary-entry", content: { text: "Profile" } }] },
+    ]);
+    const onSelectionChange = vi.fn();
+    render(<CVDocumentCanvas document={cvDocument} onSelectionChange={onSelectionChange} />);
+    const target = document.querySelector(".cv-document-canvas__page-flow [data-cv-selection-key='section:summary']");
+    expect(target).not.toBeNull();
+    if (target) fireEvent.click(target);
+    expect(onSelectionChange).toHaveBeenCalledWith({ type: "section", sectionId: "summary" });
+    expect(cvDocument.content.sections[0].id).toBe("summary");
+  });
+
+  it("supports keyboard selection and Escape deselection", () => {
+    const cvDocument = fixture([
+      { id: "summary", kind: "summary", entries: [{ id: "summary-entry", content: { text: "Profile" } }] },
+    ]);
+    const onSelectionChange = vi.fn();
+    render(<CVDocumentCanvas document={cvDocument} onSelectionChange={onSelectionChange} />);
+    const target = screen.getByRole("group", { name: "Professional Summary" });
+    fireEvent.keyDown(target, { key: "Enter" });
+    expect(onSelectionChange).toHaveBeenCalledWith({ type: "section", sectionId: "summary" });
+    fireEvent.keyDown(target, { key: "Escape" });
+    expect(onSelectionChange).toHaveBeenLastCalledWith(null);
+  });
+
+  it("clears selection when an empty canvas area is clicked", () => {
+    const onSelectionChange = vi.fn();
+    render(<CVDocumentCanvas document={fixture()} selection={{ type: "personal-details" }} onSelectionChange={onSelectionChange} />);
+    const pages = document.querySelector(".cv-document-canvas__pages");
+    expect(pages).not.toBeNull();
+    if (pages) fireEvent.click(pages);
+    expect(onSelectionChange).toHaveBeenCalledWith(null);
   });
 
   it("renders separate page surfaces when measured content overflows", () => {
