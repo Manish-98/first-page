@@ -207,4 +207,37 @@ describe("CVDocumentPage", () => {
     expect(screen.getByRole("heading", { name: "Your CV will take shape here" })).toBeInTheDocument();
   });
 
+  it("commits inline headline edits and keeps drafts out of the preview until saved", () => {
+    setActiveCV({ ...fixture(), content: { personalDetails: { headline: "Engineer" }, sections: [] } });
+    render(<CVDocumentPage editingDependencies={dependencies} />);
+    const personalDetails = screen.getByRole("group", { name: "Select personal details" });
+    fireEvent.keyDown(personalDetails, { key: "Enter" });
+    fireEvent.click(screen.getByRole("button", { name: "Edit headline" }));
+    const editor = screen.getByLabelText("Headline");
+    fireEvent.change(editor, { target: { value: "Principal Engineer" } });
+    expect(screen.getByRole("article", { name: "CV preview" })).toHaveTextContent("Engineer");
+    expect(getActiveCV()?.content.personalDetails.headline).toBe("Engineer");
+    fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+    expect(getActiveCV()?.content.personalDetails.headline).toBe("Principal Engineer");
+    expect(screen.getByRole("article", { name: "CV preview" })).toHaveTextContent("Principal Engineer");
+  });
+
+  it("cancels inline summary drafts without changing committed content", () => {
+    setActiveCV({
+      ...fixture(),
+      content: {
+        personalDetails: {},
+        sections: [{ id: "summary-section", kind: "summary", title: "Professional Summary", entries: [{ id: "summary-entry", content: { text: "Original summary" } }] }],
+      },
+    });
+    render(<CVDocumentPage editingDependencies={dependencies} />);
+    fireEvent.keyDown(screen.getByRole("group", { name: "Professional Summary" }), { key: "Enter" });
+    fireEvent.click(screen.getByRole("button", { name: "Edit summary" }));
+    fireEvent.change(screen.getByLabelText("Summary text"), { target: { value: "Unsaved draft" } });
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(getActiveCV()?.content.sections[0].entries[0].content).toEqual({ text: "Original summary" });
+    expect(screen.getByRole("article", { name: "CV preview" })).toHaveTextContent("Original summary");
+    expect(screen.getByRole("region", { name: "Selection details" })).toBeInTheDocument();
+  });
+
 });
