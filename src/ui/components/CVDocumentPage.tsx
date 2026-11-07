@@ -3,6 +3,7 @@ import type { CVCreationDependencies } from "../../application/cv/createCV";
 import type { PersonalDetails, ProfileLink } from "../../domain/cv/types";
 import { updateCVPersonalDetails } from "../../application/cv/updateCVPersonalDetails";
 import { updateCVSummary } from "../../application/cv/updateCVSummary";
+import { updateCVTextElement, type CVTextTarget } from "../../application/cv/updateCVTextElement";
 import { setActiveCV } from "../../application/cv/cvSession";
 import { useActiveCV } from "../hooks/useActiveCV";
 import AppLink from "./AppLink";
@@ -29,6 +30,9 @@ export default function CVDocumentPage({ editingDependencies }: Props) {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [summaryError, setSummaryError] = useState("");
   const [selection, setSelection] = useState<CVSelection>(null);
+  const [editingTarget, setEditingTarget] = useState<CVTextTarget | null>(null);
+  const [textDraft, setTextDraft] = useState("");
+  const [textEditError, setTextEditError] = useState("");
   const previousDocumentId = useRef<string | null>(null);
   const lastSavedForm = useRef<"details" | "summary" | "section" | null>(null);
 
@@ -104,6 +108,28 @@ export default function CVDocumentPage({ editingDependencies }: Props) {
     }
     lastSavedForm.current = "section";
     setActiveCV(updatedDocument);
+  }
+
+  function beginTextEdit(target: CVTextTarget, value: string) {
+    setEditingTarget(target);
+    setTextDraft(value);
+    setTextEditError("");
+  }
+
+  function commitTextEdit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!editingTarget) return;
+    const result = updateCVTextElement(activeDocument, editingTarget, textDraft, editingDependencies);
+    if (!result.ok) { setTextEditError(result.message); return; }
+    setActiveCV(result.document);
+    setEditingTarget(null);
+    setTextEditError("");
+  }
+
+  function cancelTextEdit() {
+    setEditingTarget(null);
+    setTextDraft("");
+    setTextEditError("");
   }
 
   function saveDetails(event: FormEvent<HTMLFormElement>) {
@@ -197,7 +223,25 @@ export default function CVDocumentPage({ editingDependencies }: Props) {
           </div>
         )}
         rightPanel={(
-          selection === null ? (
+          editingTarget ? (
+            <section className="editor-selection-details" aria-label="Inline text editor">
+              <p className="eyebrow">EDITING TEXT</p>
+              <h3>{editingTarget.type === "headline" ? "Professional headline" : "Professional summary"}</h3>
+              <form onSubmit={commitTextEdit}>
+                <label className="cv-field">
+                  <span>{editingTarget.type === "headline" ? "Headline" : "Summary text"}</span>
+                  {editingTarget.type === "headline"
+                    ? <input autoFocus value={textDraft} onChange={event => setTextDraft(event.target.value)} />
+                    : <textarea autoFocus rows={8} value={textDraft} onChange={event => setTextDraft(event.target.value)} />}
+                </label>
+                {textEditError && <p className="cv-field__error" role="alert">{textEditError}</p>}
+                <div className="experience-form__actions">
+                  <button className="button button--primary" type="submit">Save changes</button>
+                  <button className="button button--secondary" type="button" onClick={cancelTextEdit}>Cancel</button>
+                </div>
+              </form>
+            </section>
+          ) : selection === null ? (
             <div className="editor-properties-empty">
               <span className="editor-properties-empty__mark" aria-hidden="true">✦</span>
               <h3>Nothing selected</h3>
@@ -208,6 +252,7 @@ export default function CVDocumentPage({ editingDependencies }: Props) {
               <p className="eyebrow">SELECTED ELEMENT</p>
               <h3>Personal details</h3>
               <p>Document identity and contact information</p>
+              <button className="button button--secondary" type="button" onClick={() => beginTextEdit({ type: "headline" }, activeDocument.content.personalDetails.headline ?? "")}>Edit headline</button>
               <dl>
                 <div><dt>Name</dt><dd>{[activeDocument.content.personalDetails.name?.givenName, activeDocument.content.personalDetails.name?.familyName].filter(Boolean).join(" ") || "Not provided"}</dd></div>
                 <div><dt>Headline</dt><dd>{activeDocument.content.personalDetails.headline || "Not provided"}</dd></div>
@@ -222,6 +267,9 @@ export default function CVDocumentPage({ editingDependencies }: Props) {
                 <p className="eyebrow">SELECTED ELEMENT</p>
                 <h3>{getSectionLabel(selectedSection)}</h3>
                 <p>CV section</p>
+                {selectedSection.kind === "summary" && selectedSection.entries[0] && (
+                  <button className="button button--secondary" type="button" onClick={() => beginTextEdit({ type: "summary", sectionId: selectedSection.id, entryId: selectedSection.entries[0].id }, String((selectedSection.entries[0].content as { text?: string }).text ?? ""))}>Edit summary</button>
+                )}
                 <dl>
                   <div><dt>Type</dt><dd>{selectedSection.kind}</dd></div>
                   <div><dt>Entries</dt><dd>{selectedSection.entries.length}</dd></div>
